@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "2QBfHh84vkd_QdvIvZIZ4"
+uri = "file://artifacts/pharmacy-hub/src/assets/hero-bg.png"
+type = "image"
+title = "Cinematic pharmacy at golden hour"
