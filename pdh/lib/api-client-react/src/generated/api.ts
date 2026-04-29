@@ -13,7 +13,12 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  ErrorResponse,
+  HealthStatus,
+  MhraSearchResponse,
+  SearchMhraPilParams,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
 import type { ErrorType } from "../custom-fetch";
@@ -92,6 +97,101 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Searches the MHRA products database for Patient Information Leaflets filtered by UK territory
+ * @summary Search MHRA for Patient Information Leaflets
+ */
+export const getSearchMhraPilUrl = (params: SearchMhraPilParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/mhra/search?${stringifiedParams}`
+    : `/api/mhra/search`;
+};
+
+export const searchMhraPil = async (
+  params: SearchMhraPilParams,
+  options?: RequestInit,
+): Promise<MhraSearchResponse> => {
+  return customFetch<MhraSearchResponse>(getSearchMhraPilUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getSearchMhraPilQueryKey = (params?: SearchMhraPilParams) => {
+  return [`/api/mhra/search`, ...(params ? [params] : [])] as const;
+};
+
+export const getSearchMhraPilQueryOptions = <
+  TData = Awaited<ReturnType<typeof searchMhraPil>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  params: SearchMhraPilParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof searchMhraPil>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSearchMhraPilQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof searchMhraPil>>> = ({
+    signal,
+  }) => searchMhraPil(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof searchMhraPil>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type SearchMhraPilQueryResult = NonNullable<
+  Awaited<ReturnType<typeof searchMhraPil>>
+>;
+export type SearchMhraPilQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Search MHRA for Patient Information Leaflets
+ */
+
+export function useSearchMhraPil<
+  TData = Awaited<ReturnType<typeof searchMhraPil>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  params: SearchMhraPilParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof searchMhraPil>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getSearchMhraPilQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

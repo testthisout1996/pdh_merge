@@ -8,3 +8,46 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface MhraDocument {
+  title: string;
+  productName: string;
+  plNumber?: string[];
+  substanceName?: string[];
+  docType: string;
+  territory?: string | null;
+  documentUrl: string;
+  fileName?: string;
+  fileSize?: number;
+  created?: string;
+}
+
+export interface MhraSearchResponse {
+  results: MhraDocument[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  query: string;
+}
+
+export interface ErrorResponse {
+  message: string;
+}
+
+export type SearchMhraPilParams = {
+  /**
+   * Search query (medication name)
+   */
+  q: string;
+  /**
+   * Page number
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Results per page
+   * @minimum 1
+   * @maximum 50
+   */
+  pageSize?: number;
+};

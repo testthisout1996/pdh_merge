@@ -6,8 +6,8 @@ pnpm workspace monorepo using TypeScript. Hosts the **Pharmacy Dispensing Hub** 
 
 ## Artifacts
 
-- `artifacts/pharmacy-hub` — React + Vite frontend at `/`. The hub landing page (hero, tools, FAQ, service status) plus placeholder routes at `/tools/pil-printer` and `/tools/prednisolone-calculator` where the real tools will be plugged in later.
-- `artifacts/api-server` — shared Express API (not yet used by the hub).
+- `artifacts/pharmacy-hub` — React + Vite frontend at `/`. The hub landing page (hero, tools, FAQ, service status) plus the PIL Printer tool at `/tools/pil-printer` (MHRA Patient Information Leaflet search/bulk-update/status, restyled to match the PDH theme) and a placeholder at `/tools/prednisolone-calculator`. Dev server proxies `/api` → `http://localhost:${API_PORT ?? 8080}`.
+- `artifacts/api-server` — shared Express API on port 8080. Routes: `GET /api/healthz`, `GET /api/mhra/search`, `GET /api/mhra/check-url`, `GET /api/status`. The MHRA endpoints proxy Azure Search (`mhraproducts4853.search.windows.net`) filtered by `doc_type eq 'Pil' and territory eq 'UK'`.
 - `artifacts/mockup-sandbox` — design sandbox.
 
 ## Stack

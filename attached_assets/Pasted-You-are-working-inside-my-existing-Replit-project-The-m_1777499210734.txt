@@ -1,0 +1,41 @@
+You are working inside my existing Replit project.
+
+The main site is in the `pdh` folder. I also have another project in the `MHRA` folder.
+
+Final goal:
+Add the `MHRA` project into the `pdh` project as a tool/function inside the same app, so the final result is one single unified site. Do not recreate everything from scratch. Preserve the current `pdh` UI, layout, styling, branding, navigation, and frontend structure as much as possible. The `MHRA` project should be integrated into the `pdh` app and made to match the existing `pdh` design.
+
+Important styling requirement:
+The `MHRA` app currently has its own frontend, theme, styles, and possibly its own branding. I do not want those to remain visually separate. Import the `MHRA` functionality into `pdh`, but restyle it so it uses the existing `pdh` UI/theme/components and looks like part of the same site. Keep the `pdh` design intact and adapt the `MHRA` pages/tools to fit that design system instead of introducing a new one.
+
+Instructions:
+1. Inspect the project structure, with special focus on the `pdh` and `MHRA` folders.
+2. Determine how `pdh` is currently built, what framework it uses, how it starts, and how its UI is organized.
+3. Inspect the `MHRA` folder and identify its pages, components, routes, assets, and any APIs or backend logic it depends on.
+4. Integrate the `MHRA` functionality into `pdh` as a tool, page, route, or embedded feature inside the existing app.
+5. Keep the `pdh` site’s current UI, style, layout, and branding as the base.
+6. Adapt the `MHRA` frontend so it matches the `pdh` theme and visual style.
+7. Do not rebuild the whole app or redesign the main site.
+8. Do not change unrelated files, assets, or configuration unless absolutely necessary for integration.
+9. Make only the minimum changes needed to merge `MHRA` into `pdh` cleanly.
+
+Technical requirements:
+- Check the correct port for the main `pdh` app.
+- Check whether the `MHRA` code introduces any additional ports or services.
+- Make sure the final app runs correctly in Replit.
+- Ensure any APIs, fetch calls, or backend endpoints used by `MHRA` still work after integration.
+- Ensure there are no port conflicts.
+- Ensure the app listens on the correct host and port for Replit deployment.
+
+Before changing anything:
+- Summarize what you found in the `pdh` folder.
+- Summarize what you found in the `MHRA` folder.
+- Explain the integration plan.
+- Then apply only the smallest necessary changes.
+
+After changes:
+- Confirm the final route structure.
+- Confirm the main port and any extra ports.
+- Confirm the app starts successfully.
+- Confirm the `MHRA` functionality is now part of the `pdh` app.
+- Confirm the final result is one unified site with the `pdh` UI preserved.

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ToolPlaceholder from "@/pages/tool-placeholder";
+import PilPrinter from "@/pages/pil-printer";
 
 const queryClient = new QueryClient();
 
@@ -12,9 +13,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/tools/pil-printer">
-        {() => <ToolPlaceholder toolName="Patient Information Leaflet Printer" />}
-      </Route>
+      <Route path="/tools/pil-printer" component={PilPrinter} />
       <Route path="/tools/prednisolone-calculator">
         {() => <ToolPlaceholder toolName="Prednisolone Reducing Regimen Calculator" />}
       </Route>

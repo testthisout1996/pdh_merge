@@ -1,0 +1,52 @@
+You are working inside my existing Replit project, which is the main hub website.
+
+Final goal:
+Create one single app/site that contains all of the functionality currently spread across my separate projects. The final result should be one unified website/app that does everything the existing projects do, from one place, with one consistent navigation and one consistent user experience.
+
+Current folders to integrate:
+- `PIL`
+- `MHRA`
+
+Goal:
+Incorporate the existing projects located in the folders named `PIL` and `MHRA` into this current hub site, while preserving the hub’s existing design, layout, navigation style, theme, and branding as much as possible. Do not make unrelated changes.
+
+Important UI/theme requirement:
+The `PIL` and `MHRA` apps currently have different styles, frontends, logos, themes, and visual design from the main hub. I want those apps to be imported into this project, but their UI should be adapted so they match the main hub’s current UI/theme/frontend as closely as possible. Do not keep their old standalone styling unless it is absolutely necessary for functionality. Reuse the main hub’s layout, navbar, colors, typography, spacing, buttons, and general visual language so the final experience looks like one consistent site.
+
+Instructions:
+1. Inspect the current project structure first.
+2. Look specifically through the `PIL` and `MHRA` folders.
+3. Determine how each folder is currently built, what routes/pages/components it contains, and how it starts.
+4. Import their functionality into the main hub as dropdown menu items and/or routed subpages under the existing navigation.
+5. Merge the actual functionality into this one app/site so the user can access all features from the same unified interface.
+6. Keep the current hub styling, logo placement, and overall visual design unchanged unless absolutely required for integration.
+7. Do not alter unrelated code, assets, or configuration.
+8. Only make the smallest necessary changes to make the three projects work together as one site.
+
+Styling requirements:
+- Replace or restyle any `PIL` and `MHRA` UI so it visually matches the main hub.
+- Normalize components from the imported apps to use the main app’s existing frontend patterns.
+- If needed, create wrappers or shared layout components so the imported pages inherit the hub’s theme automatically.
+- Do not preserve separate app branding, themes, or layouts unless there is a hard technical reason.
+- The final product should feel like one app, not three separate apps stitched together.
+- If the imported apps have separate CSS frameworks, component libraries, or themes, refactor them only as needed so they inherit the hub’s design system rather than maintaining separate visual identities.
+- Keep the different app content and functionality, but make the presentation consistent with the hub.
+
+Technical requirements:
+- Check whether the project needs a single main server or multiple services.
+- Verify which port(s) each app uses.
+- Ensure all web servers listen on the correct host and port for Replit deployment.
+- If any app uses an API, confirm the API endpoints still work after integration.
+- Make sure the final app runs successfully in Replit without broken routes, missing imports, theme mismatches, or port conflicts.
+
+Before changing anything:
+- Summarize what you found in the `PIL` and `MHRA` folders.
+- Explain the integration plan.
+- Then apply only the minimum edits needed.
+
+After changes:
+- Confirm the final route structure.
+- Confirm the main port and any extra ports.
+- Confirm the app starts cleanly and the main hub loads successfully.
+- Confirm the imported apps now match the main hub’s theme and frontend style.
+- Confirm there is only one unified app/site for users to use.
