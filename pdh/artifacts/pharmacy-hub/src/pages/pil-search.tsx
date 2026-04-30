@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import UpdateTab from "@/components/pil/UpdateTab";
@@ -486,9 +486,7 @@ export default function PilSearch() {
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
       <Navbar />
 
-      <div className="pt-16">
-        <PilSearchHero activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
+      <PilSearchHero activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
         <motion.div
@@ -497,25 +495,6 @@ export default function PilSearch() {
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="rounded-md bg-muted/60 p-1 mb-6">
-              <TabsTrigger
-                value="search"
-                className="rounded-lg gap-1.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
-                data-testid="tab-search"
-              >
-                <Search className="w-3.5 h-3.5" />
-                Search
-              </TabsTrigger>
-              <TabsTrigger
-                value="update"
-                className="rounded-lg gap-1.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
-                data-testid="tab-update"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Bulk Update
-              </TabsTrigger>
-            </TabsList>
-
             <TabsContent value="search" className="focus-visible:outline-none">
               <SearchTab />
             </TabsContent>
