@@ -77,56 +77,56 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Pastel palette */
-  /* Background: Soft, warm off-white */
-  --background: 340 20% 98%;
-  --foreground: 340 30% 15%;
-  --border: 340 15% 92%;
-  
-  --card: 0 0% 100%;
-  --card-foreground: 340 30% 15%;
-  --card-border: 340 15% 92%;
+  /* Purple/violet palette derived from the hero overlay (#2c1b3d = hsl(268 38% 17%)) */
+  /* Background: Near-white with subtle purple undertone */
+  --background: 268 18% 98%;
+  --foreground: 268 38% 12%;
+  --border: 268 20% 90%;
 
-  --sidebar: 340 20% 98%;
-  --sidebar-foreground: 340 30% 15%;
-  --sidebar-border: 340 15% 92%;
-  --sidebar-primary: 340 60% 70%;
+  --card: 0 0% 100%;
+  --card-foreground: 268 38% 12%;
+  --card-border: 268 20% 90%;
+
+  --sidebar: 268 18% 98%;
+  --sidebar-foreground: 268 38% 12%;
+  --sidebar-border: 268 20% 90%;
+  --sidebar-primary: 268 52% 52%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 340 30% 94%;
-  --sidebar-accent-foreground: 340 30% 15%;
-  --sidebar-ring: 340 60% 70%;
+  --sidebar-accent: 268 25% 94%;
+  --sidebar-accent-foreground: 268 38% 12%;
+  --sidebar-ring: 268 52% 52%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 340 30% 15%;
-  --popover-border: 340 15% 92%;
+  --popover-foreground: 268 38% 12%;
+  --popover-border: 268 20% 90%;
 
-  /* Primary: Soft Rose / Coral */
-  --primary: 350 75% 72%;
+  /* Primary: Vibrant purple */
+  --primary: 268 52% 52%;
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary: Lavender / Violet */
-  --secondary: 260 50% 80%;
-  --secondary-foreground: 260 40% 25%;
+  /* Secondary: Periwinkle / steel blue */
+  --secondary: 225 42% 68%;
+  --secondary-foreground: 225 42% 20%;
 
-  /* Muted: Soft grayish rose */
-  --muted: 340 25% 94%;
-  --muted-foreground: 340 15% 45%;
+  /* Muted: Soft lavender-grey */
+  --muted: 268 20% 95%;
+  --muted-foreground: 268 18% 45%;
 
-  /* Accent: Sky / Periwinkle Blue */
-  --accent: 215 70% 85%;
-  --accent-foreground: 215 40% 25%;
+  /* Accent: Light sky-blue periwinkle */
+  --accent: 215 55% 82%;
+  --accent-foreground: 215 40% 22%;
 
-  --destructive: 0 70% 65%;
+  --destructive: 0 70% 58%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 340 15% 90%;
-  --ring: 350 75% 72%;
+  --input: 268 18% 90%;
+  --ring: 268 52% 52%;
 
-  --chart-1: 350 75% 72%;
-  --chart-2: 260 50% 80%;
-  --chart-3: 215 70% 85%;
-  --chart-4: 40 80% 75%;
-  --chart-5: 160 50% 75%;
+  --chart-1: 268 52% 52%;
+  --chart-2: 225 42% 68%;
+  --chart-3: 215 55% 72%;
+  --chart-4: 40 80% 65%;
+  --chart-5: 160 50% 65%;
 
   --app-font-sans: 'Manrope', sans-serif;
   --app-font-serif: 'Manrope', sans-serif;
@@ -178,49 +178,49 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  /* Deep twilight pastel */
-  --background: 260 30% 12%;
-  --foreground: 340 20% 95%;
-  --border: 260 20% 20%;
-  
-  --card: 260 30% 15%;
-  --card-foreground: 340 20% 95%;
-  --card-border: 260 20% 22%;
+  /* Deep purple dark mode */
+  --background: 268 38% 10%;
+  --foreground: 268 15% 95%;
+  --border: 268 25% 20%;
 
-  --sidebar: 260 30% 15%;
-  --sidebar-foreground: 340 20% 95%;
-  --sidebar-border: 260 20% 22%;
-  --sidebar-primary: 350 75% 72%;
+  --card: 268 35% 13%;
+  --card-foreground: 268 15% 95%;
+  --card-border: 268 25% 22%;
+
+  --sidebar: 268 35% 13%;
+  --sidebar-foreground: 268 15% 95%;
+  --sidebar-border: 268 25% 22%;
+  --sidebar-primary: 268 52% 65%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 260 25% 25%;
-  --sidebar-accent-foreground: 340 20% 95%;
-  --sidebar-ring: 350 75% 72%;
+  --sidebar-accent: 268 28% 22%;
+  --sidebar-accent-foreground: 268 15% 95%;
+  --sidebar-ring: 268 52% 65%;
 
-  --popover: 260 30% 15%;
-  --popover-foreground: 340 20% 95%;
-  --popover-border: 260 20% 22%;
+  --popover: 268 35% 13%;
+  --popover-foreground: 268 15% 95%;
+  --popover-border: 268 25% 22%;
 
-  --primary: 350 75% 68%;
+  --primary: 268 52% 65%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 260 40% 30%;
-  --secondary-foreground: 260 50% 85%;
+  --secondary: 225 35% 30%;
+  --secondary-foreground: 225 50% 88%;
 
-  --muted: 260 25% 20%;
-  --muted-foreground: 260 15% 65%;
+  --muted: 268 28% 18%;
+  --muted-foreground: 268 15% 65%;
 
-  --accent: 215 50% 30%;
-  --accent-foreground: 215 70% 85%;
+  --accent: 215 45% 30%;
+  --accent-foreground: 215 60% 85%;
 
   --destructive: 0 70% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 260 20% 25%;
-  --ring: 350 75% 68%;
+  --input: 268 25% 22%;
+  --ring: 268 52% 65%;
 
-  --chart-1: 350 75% 68%;
-  --chart-2: 260 50% 60%;
-  --chart-3: 215 70% 65%;
+  --chart-1: 268 52% 65%;
+  --chart-2: 225 42% 60%;
+  --chart-3: 215 55% 65%;
   --chart-4: 40 80% 60%;
   --chart-5: 160 50% 60%;
 
