@@ -118,12 +118,36 @@ function NavLink({
 export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
   const [scrolled, setScrolled] = React.useState(false);
   const [location, setLocation] = useLocation();
+  const [toolsOpen, setToolsOpen] = React.useState(false);
+  const closeTimerRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const cancelToolsClose = React.useCallback(() => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const openTools = React.useCallback(() => {
+    cancelToolsClose();
+    setToolsOpen(true);
+  }, [cancelToolsClose]);
+
+  const scheduleToolsClose = React.useCallback(() => {
+    cancelToolsClose();
+    closeTimerRef.current = window.setTimeout(() => {
+      setToolsOpen(false);
+      closeTimerRef.current = null;
+    }, 140);
+  }, [cancelToolsClose]);
+
+  React.useEffect(() => () => cancelToolsClose(), [cancelToolsClose]);
 
   const active: ActiveSection = activeProp ?? getActiveFromLocation(location);
 
@@ -176,9 +200,13 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
               onClick={() => handleNavigate("hero")}
             />
 
-            <DropdownMenu>
+            <DropdownMenu open={toolsOpen} onOpenChange={setToolsOpen}>
               <DropdownMenuTrigger
-                className={`flex items-center gap-1.5 text-[12px] font-semibold tracking-widest uppercase transition-colors focus:outline-none ${
+                onMouseEnter={openTools}
+                onMouseLeave={scheduleToolsClose}
+                onFocus={openTools}
+                onBlur={scheduleToolsClose}
+                className={`flex items-center gap-1.5 py-5 text-[12px] font-semibold tracking-widest uppercase transition-colors focus:outline-none ${
                   active === "tools" ? "text-primary" : "text-foreground/80 hover:text-primary"
                 }`}
               >
@@ -186,8 +214,11 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="center"
-                sideOffset={16}
-                className="w-[300px] rounded-2xl p-2 shadow-xl border border-border/50 bg-white"
+                sideOffset={scrolled ? 8 : 12}
+                onMouseEnter={openTools}
+                onMouseLeave={scheduleToolsClose}
+                onCloseAutoFocus={(e) => e.preventDefault()}
+                className="w-[300px] rounded-md p-2 shadow-xl border border-border/50 bg-white"
               >
                 <DropdownMenuItem
                   onClick={() => handleNavigate("tools")}
