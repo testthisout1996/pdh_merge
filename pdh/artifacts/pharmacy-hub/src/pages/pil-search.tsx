@@ -56,9 +56,11 @@ function formatDate(dateStr?: string) {
 function PilSearchHero({
   activeTab,
   onTabChange,
+  pilToolsRef,
 }: {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  pilToolsRef?: React.RefObject<HTMLParagraphElement | null>;
 }) {
   return (
     <div className="relative w-full overflow-hidden" style={{ height: "425px" }}>
@@ -77,7 +79,10 @@ function PilSearchHero({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         >
-          <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">
+          <p
+            ref={pilToolsRef}
+            className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2"
+          >
             PIL Tools
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
@@ -479,33 +484,92 @@ function SearchTab() {
   );
 }
 
+const NAVBAR_H = 64;   // h-16 fixed navbar
+const HERO_H = 425;    // hero section height
+const GAP = 12;        // desired gap between PIL TOOLS label and navbar bottom
+
 export default function PilSearch() {
   const [activeTab, setActiveTab] = React.useState("search");
+  const [heroLocked, setHeroLocked] = React.useState(false);
+
+  const pageRef = React.useRef<HTMLDivElement>(null);
+  const pilToolsRef = React.useRef<HTMLParagraphElement>(null);
+  const lockAtRef = React.useRef<number>(0);
+  const heroFixedTopRef = React.useRef<number>(0);
+
+  // Measure where PIL TOOLS sits at scroll=0 so we know when to lock
+  React.useLayoutEffect(() => {
+    const pilEl = pilToolsRef.current;
+    if (!pilEl) return;
+    const rect = pilEl.getBoundingClientRect();
+    // rect.top = viewport Y of PIL TOOLS when scroll=0
+    // We want PIL TOOLS to end up at NAVBAR_H + GAP when locked
+    lockAtRef.current = rect.top - (NAVBAR_H + GAP);
+    // When fixed, the hero's top = NAVBAR_H - lockAt (will be negative)
+    heroFixedTopRef.current = NAVBAR_H - lockAtRef.current;
+  }, []);
+
+  React.useEffect(() => {
+    const page = pageRef.current;
+    if (!page) return;
+    const onScroll = () => {
+      setHeroLocked(page.scrollTop >= lockAtRef.current);
+    };
+    page.addEventListener("scroll", onScroll, { passive: true });
+    return () => page.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
+    <div
+      ref={pageRef}
+      className="h-[100dvh] overflow-y-auto bg-background selection:bg-primary/20"
+    >
       <Navbar />
 
-      <PilSearchHero activeTab={activeTab} onTabChange={setActiveTab} />
-
-      <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      <div style={{ paddingTop: NAVBAR_H }}>
+        {/* Hero — switches to position:fixed when scroll threshold is reached */}
+        <div
+          style={
+            heroLocked
+              ? {
+                  position: "fixed",
+                  top: heroFixedTopRef.current,
+                  left: 0,
+                  right: 0,
+                  zIndex: 30,
+                }
+              : {}
+          }
         >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsContent value="search" className="focus-visible:outline-none">
-              <SearchTab />
-            </TabsContent>
-            <TabsContent value="update" className="focus-visible:outline-none">
-              <UpdateTab />
-            </TabsContent>
-          </Tabs>
-        </motion.div>
-      </main>
+          <PilSearchHero
+            pilToolsRef={pilToolsRef}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        </div>
 
-      <Footer />
+        {/* Spacer keeps the content from jumping up when hero leaves the flow */}
+        {heroLocked && <div style={{ height: HERO_H }} />}
+
+        <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsContent value="search" className="focus-visible:outline-none">
+                <SearchTab />
+              </TabsContent>
+              <TabsContent value="update" className="focus-visible:outline-none">
+                <UpdateTab />
+              </TabsContent>
+            </Tabs>
+          </motion.div>
+        </main>
+
+        <Footer />
+      </div>
     </div>
   );
 }
