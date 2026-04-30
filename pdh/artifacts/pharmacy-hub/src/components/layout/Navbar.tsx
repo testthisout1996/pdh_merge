@@ -149,15 +149,20 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-      className="fixed top-4 left-0 right-0 z-50 px-4 md:px-6 pointer-events-none flex justify-center"
+      className="fixed top-0 left-0 right-0 z-50 pointer-events-none"
     >
-      <header
-        className={`pointer-events-auto w-full max-w-6xl rounded-md border bg-white transition-all duration-300 ${
-          scrolled
-            ? "border-border/60 shadow-md shadow-black/5"
-            : "border-border/30 shadow-sm"
+      <div
+        className={`flex justify-center transition-all duration-300 ease-out ${
+          scrolled ? "px-0 pt-0" : "px-4 md:px-6 pt-4"
         }`}
       >
+        <header
+          className={`pointer-events-auto w-full bg-white transition-all duration-300 ease-out ${
+            scrolled
+              ? "max-w-none rounded-none border-x-0 border-t-0 border-b border-border/60 shadow-md shadow-black/5"
+              : "max-w-6xl rounded-md border border-border/30 shadow-sm"
+          }`}
+        >
         <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 px-4 md:px-6 gap-4">
           <div className="justify-self-start">
             <Logo onGoHome={() => handleNavigate("hero")} />
@@ -181,7 +186,8 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="center"
-                className="w-[300px] rounded-2xl p-2 shadow-xl border-border/50 bg-white/95 backdrop-blur-xl"
+                sideOffset={16}
+                className="w-[300px] rounded-2xl p-2 shadow-xl border border-border/50 bg-white"
               >
                 <DropdownMenuItem
                   onClick={() => handleNavigate("tools")}
@@ -216,24 +222,12 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                     </div>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
-                    <DropdownMenuSubContent className="w-[280px] rounded-2xl p-2 shadow-xl border-border/50 bg-white/95 backdrop-blur-xl ml-2">
-                      <Link href="/tools/pils/pil-search">
-                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group">
-                          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                            <Search className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-semibold text-sm text-foreground">
-                              PIL Search
-                            </div>
-                            <div className="text-[11px] text-muted-foreground">
-                              Find official MHRA leaflets
-                            </div>
-                          </div>
-                        </DropdownMenuItem>
-                      </Link>
+                    <DropdownMenuSubContent
+                      sideOffset={12}
+                      className="w-[280px] rounded-2xl p-2 shadow-xl border border-border/50 bg-white"
+                    >
                       <Link href="/tools/pils/pil-printer">
-                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group mt-1">
+                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group">
                           <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <Printer className="w-4 h-4" />
                           </div>
@@ -246,6 +240,21 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                             </div>
                             <div className="text-[11px] text-muted-foreground">
                               Batch print MDS leaflets
+                            </div>
+                          </div>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/tools/pils/pil-search">
+                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group mt-1">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                            <Search className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm text-foreground">
+                              PIL Search
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">
+                              Find official MHRA leaflets
                             </div>
                           </div>
                         </DropdownMenuItem>
@@ -368,22 +377,6 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                       </div>
                       <SheetClose asChild>
                         <Link
-                          href="/tools/pils/pil-search"
-                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                            <Search className="w-4 h-4" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-sm">PIL Search</span>
-                            <span className="text-[10px] text-muted-foreground">
-                              Find MHRA leaflets
-                            </span>
-                          </div>
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
                           href="/tools/pils/pil-printer"
                           className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
                         >
@@ -399,6 +392,22 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                             </span>
                             <span className="text-[10px] text-muted-foreground">
                               Batch print MDS leaflets
+                            </span>
+                          </div>
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/tools/pils/pil-search"
+                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <Search className="w-4 h-4" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-sm">PIL Search</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              Find MHRA leaflets
                             </span>
                           </div>
                         </Link>
@@ -471,7 +480,8 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
             </Sheet>
           </div>
         </div>
-      </header>
+        </header>
+      </div>
     </motion.div>
   );
 }
