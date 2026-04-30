@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import toolsMenuImage from "@/assets/tools-menu-bg.jpeg";
 import {
   Menu,
   ChevronDown,
@@ -278,30 +277,9 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                 onMouseEnter={openTools}
                 onMouseLeave={scheduleToolsClose}
                 onCloseAutoFocus={(e) => e.preventDefault()}
-                className="w-[640px] rounded-md p-0 shadow-xl border border-border/50 bg-white relative overflow-hidden"
+                className="w-[320px] rounded-md p-0 shadow-xl border border-border/50 bg-white relative overflow-hidden"
               >
-                {/* Right-half decorative image with the same overlays as
-                    the hero video. The image keeps its natural aspect
-                    ratio at the menu's height and is anchored to the
-                    right edge — anything that overflows on the left is
-                    cropped by the parent's overflow-hidden. */}
-                <div
-                  className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none"
-                  aria-hidden="true"
-                >
-                  <img
-                    src={toolsMenuImage}
-                    alt=""
-                    className="absolute right-0 top-0 h-full w-auto max-w-none"
-                    style={{ filter: "blur(2.5px) saturate(1.05)" }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-[#2c1b3d]/90 mix-blend-multiply" />
-                  <div className="absolute inset-0 bg-[#2c1b3d]/40" />
-                  <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
-                </div>
-
-                {/* Left-half: actual menu items */}
-                <div className="relative z-10 w-1/2 p-2">
+                <div className="p-2">
                 <DropdownMenuItem
                   onClick={() => handleNavigate("tools")}
                   className="rounded-md p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group"
