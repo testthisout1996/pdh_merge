@@ -31,6 +31,7 @@ import {
   buildSearchQuery,
   classifyPilResult,
 } from "@/lib/pilUtils";
+import heroImage from "@assets/asian-client-navigates-pharmacy-shelves-full-drugs-vitamins-re_1777572824357.jpg";
 
 const PAGE_SIZE = 10;
 
@@ -50,6 +51,72 @@ function formatDate(dateStr?: string) {
     month: "short",
     day: "numeric",
   });
+}
+
+function PilSearchHero({
+  activeTab,
+  onTabChange,
+}: {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}) {
+  return (
+    <div className="relative w-full overflow-hidden" style={{ height: "340px" }}>
+      <img
+        src={heroImage}
+        alt="Pharmacy interior with staff and customers"
+        className="absolute inset-0 w-full h-full object-cover object-center"
+        style={{ filter: "saturate(0.9)" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
+
+      <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        >
+          <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">
+            PIL Tools
+          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
+            Patient Information Leaflets
+          </h1>
+          <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed mb-6">
+            Search the official MHRA database for verified Patient Information
+            Leaflets for medications licensed in the UK. Accepts medication
+            names, active substances, or PL numbers.
+          </p>
+
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={() => onTabChange("search")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                activeTab === "search"
+                  ? "bg-white text-[#2c1b3d] shadow-md"
+                  : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
+              }`}
+            >
+              <Search className="w-4 h-4" />
+              Search
+            </button>
+            <button
+              onClick={() => onTabChange("update")}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                activeTab === "update"
+                  ? "bg-white text-[#2c1b3d] shadow-md"
+                  : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
+              }`}
+            >
+              <RefreshCw className="w-4 h-4" />
+              Bulk Update
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
 }
 
 function SearchTab() {
@@ -86,21 +153,6 @@ function SearchTab() {
   return (
     <div className="flex flex-col gap-8">
       <section className="space-y-4">
-        <div className="max-w-2xl">
-          <h2 className="text-2xl font-bold text-foreground tracking-tight mb-1.5">
-            Patient Information Leaflets
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Search the official MHRA database for verified Patient Information
-            Leaflets (PILs) for medications licensed in the UK. Accepts
-            medication names, active substances, or PL numbers (e.g.{" "}
-            <code className="bg-muted px-1 py-0.5 rounded font-mono text-xs">
-              17509/0024
-            </code>
-            ).
-          </p>
-        </div>
-
         <Card className="shadow-sm border-border/60 overflow-hidden rounded-md">
           <div className="bg-muted/30 px-5 py-3 border-b border-border/60 flex items-center gap-2">
             <Info className="w-4 h-4 text-primary shrink-0" />
@@ -428,17 +480,23 @@ function SearchTab() {
 }
 
 export default function PilSearch() {
+  const [activeTab, setActiveTab] = React.useState("search");
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
       <Navbar />
 
-      <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 pt-28 pb-8">
+      <div className="pt-16">
+        <PilSearchHero activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
+
+      <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Tabs defaultValue="search" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="rounded-md bg-muted/60 p-1 mb-6">
               <TabsTrigger
                 value="search"
