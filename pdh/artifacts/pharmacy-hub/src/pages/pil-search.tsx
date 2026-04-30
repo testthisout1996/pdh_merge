@@ -496,25 +496,29 @@ export default function PilSearch() {
   const pilToolsRef = React.useRef<HTMLParagraphElement>(null);
   const lockAtRef = React.useRef<number>(0);
   const heroFixedTopRef = React.useRef<number>(0);
-
-  // Measure where PIL TOOLS sits at scroll=0 so we know when to lock
-  React.useLayoutEffect(() => {
-    const pilEl = pilToolsRef.current;
-    if (!pilEl) return;
-    const rect = pilEl.getBoundingClientRect();
-    // rect.top = viewport Y of PIL TOOLS when scroll=0 (hero starts at y=0, no padding)
-    // We want PIL TOOLS to end up at NAVBAR_H + GAP when locked
-    lockAtRef.current = rect.top - (NAVBAR_H + GAP);
-    // When hero is fixed, it should sit at exactly the scroll-shifted position.
-    // heroFixedTop = -(lockAt) keeps the hero at the same visual position at lock moment.
-    heroFixedTopRef.current = -lockAtRef.current;
-  }, []);
+  const heroLockedRef = React.useRef<boolean>(false);
 
   React.useEffect(() => {
     const page = pageRef.current;
     if (!page) return;
     const onScroll = () => {
-      setHeroLocked(page.scrollTop >= lockAtRef.current);
+      const scrollTop = page.scrollTop;
+      const pilEl = pilToolsRef.current;
+
+      // While unlocked: recalculate the lock threshold every frame so the
+      // measurement reflects the element's true settled position (unaffected
+      // by the mount animation's initial y-offset).
+      if (!heroLockedRef.current && pilEl) {
+        const rect = pilEl.getBoundingClientRect();
+        // rect.top + scrollTop = PIL TOOLS position relative to scroll container top
+        const pilToolsDomY = rect.top + scrollTop;
+        lockAtRef.current = pilToolsDomY - (NAVBAR_H + GAP);
+        heroFixedTopRef.current = -lockAtRef.current;
+      }
+
+      const shouldLock = lockAtRef.current > 0 && scrollTop >= lockAtRef.current;
+      heroLockedRef.current = shouldLock;
+      setHeroLocked(shouldLock);
     };
     page.addEventListener("scroll", onScroll, { passive: true });
     return () => page.removeEventListener("scroll", onScroll);
