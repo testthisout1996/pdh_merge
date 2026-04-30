@@ -484,9 +484,12 @@ function SearchTab() {
   );
 }
 
-const NAVBAR_H = 64;   // h-16 fixed navbar
+const NAVBAR_TOP_GAP = 16; // pt-4 spacing above the navbar box when not scrolled
+const NAVBAR_BAR_H = 64;  // h-16 navbar bar height
+const NAVBAR_BOTTOM = NAVBAR_TOP_GAP + NAVBAR_BAR_H; // = 80px from viewport top
+const GAP = NAVBAR_TOP_GAP; // lock gap matches the navbar's own top spacing (16px)
+const LOCK_TARGET_Y = NAVBAR_BOTTOM + GAP; // PIL TOOLS locks at this viewport Y = 96px
 const HERO_H = 425;    // hero section height
-const GAP = 12;        // desired gap between PIL TOOLS label and navbar bottom
 
 export default function PilSearch() {
   const [activeTab, setActiveTab] = React.useState("search");
@@ -512,7 +515,7 @@ export default function PilSearch() {
         const rect = pilEl.getBoundingClientRect();
         // rect.top + scrollTop = PIL TOOLS position relative to scroll container top
         const pilToolsDomY = rect.top + scrollTop;
-        lockAtRef.current = pilToolsDomY - (NAVBAR_H + GAP);
+        lockAtRef.current = pilToolsDomY - LOCK_TARGET_Y;
         heroFixedTopRef.current = -lockAtRef.current;
       }
 
