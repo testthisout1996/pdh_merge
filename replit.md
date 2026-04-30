@@ -29,3 +29,7 @@ The Vite dev server proxies `/api` → `http://localhost:8080`, so the frontend 
 - Install: `cd pdh && pnpm install`
 - Build API: `cd pdh && pnpm --filter @workspace/api-server run build`
 - Typecheck all: `cd pdh && pnpm run typecheck`
+
+## UI conventions
+
+- **Corner radius**: all "boxes" (cards, panels, status banners, menu items, dropdowns, dialogs, etc.) use `rounded-md` so they match the navbar's corner radius. The base `Card` primitive is already `rounded-md`, so any new `<Card>` inherits this automatically. When writing new components, use `rounded-md` on container divs — avoid `rounded-xl`, `rounded-2xl`, `rounded-3xl`. Pills/circles (`rounded-full`) and small status dots are exceptions.

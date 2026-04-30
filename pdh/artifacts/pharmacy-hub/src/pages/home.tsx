@@ -536,7 +536,7 @@ function ToolsSection() {
             <Card className="h-full border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 bg-white flex flex-col group overflow-hidden">
               <div className="h-2 w-full bg-gradient-to-r from-primary/40 to-primary" />
               <CardHeader>
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                   <Printer className="w-7 h-7" />
                 </div>
                 <CardTitle className="text-xl">PIL Printer</CardTitle>
@@ -563,7 +563,7 @@ function ToolsSection() {
               </CardContent>
               <CardFooter>
                 <Link href="/tools/pils/pil-search" className="w-full">
-                  <Button className="w-full rounded-xl shadow-sm group-hover:bg-primary/90">
+                  <Button className="w-full rounded-md shadow-sm group-hover:bg-primary/90">
                     Launch Tool
                   </Button>
                 </Link>
@@ -580,7 +580,7 @@ function ToolsSection() {
             <Card className="h-full border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 bg-white flex flex-col group overflow-hidden">
               <div className="h-2 w-full bg-gradient-to-r from-secondary/40 to-secondary" />
               <CardHeader>
-                <div className="w-14 h-14 rounded-2xl bg-secondary/15 text-secondary-foreground flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-md bg-secondary/15 text-secondary-foreground flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                   <Calculator className="w-7 h-7" />
                 </div>
                 <CardTitle className="text-xl">
@@ -611,7 +611,7 @@ function ToolsSection() {
                 <Link href="/tools/prednisolone-calculator" className="w-full">
                   <Button
                     variant="secondary"
-                    className="w-full rounded-xl shadow-sm text-white bg-secondary group-hover:bg-secondary/90"
+                    className="w-full rounded-md shadow-sm text-white bg-secondary group-hover:bg-secondary/90"
                   >
                     Launch Tool
                   </Button>
@@ -632,7 +632,7 @@ function ToolsSection() {
               </div>
               <div className="h-2 w-full bg-muted-foreground/20" />
               <CardHeader>
-                <div className="w-14 h-14 rounded-2xl bg-background flex items-center justify-center mb-4 text-muted-foreground border border-border">
+                <div className="w-14 h-14 rounded-md bg-background flex items-center justify-center mb-4 text-muted-foreground border border-border">
                   <FileText className="w-7 h-7" />
                 </div>
                 <CardTitle className="text-xl text-muted-foreground">
@@ -661,7 +661,7 @@ function ToolsSection() {
                 <Button
                   disabled
                   variant="outline"
-                  className="w-full rounded-xl bg-background/50"
+                  className="w-full rounded-md bg-background/50"
                 >
                   Coming Soon
                 </Button>
@@ -695,7 +695,7 @@ function FAQSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-border/50"
+          className="bg-white rounded-md p-6 md:p-8 shadow-sm border border-border/50"
         >
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
@@ -839,7 +839,7 @@ function ReportSection({ onBack }: { onBack: () => void }) {
           </button>
 
           <div className="text-center mb-10">
-            <div className="inline-flex w-14 h-14 rounded-2xl bg-primary/10 text-primary items-center justify-center mb-4">
+            <div className="inline-flex w-14 h-14 rounded-md bg-primary/10 text-primary items-center justify-center mb-4">
               <AlertTriangle className="w-7 h-7" />
             </div>
             <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">

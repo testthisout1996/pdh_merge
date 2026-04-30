@@ -9,7 +9,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div className="flex flex-col gap-3">
             <Link href="/" className="flex items-center gap-2 group inline-flex w-fit">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-sm">
                 <Cross className="w-4 h-4 text-white" />
               </div>
               <span className="font-display font-semibold text-lg tracking-tight text-foreground">

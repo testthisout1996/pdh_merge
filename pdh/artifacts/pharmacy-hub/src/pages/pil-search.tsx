@@ -101,7 +101,7 @@ function SearchTab() {
           </p>
         </div>
 
-        <Card className="shadow-sm border-border/60 overflow-hidden rounded-2xl">
+        <Card className="shadow-sm border-border/60 overflow-hidden rounded-md">
           <div className="bg-muted/30 px-5 py-3 border-b border-border/60 flex items-center gap-2">
             <Info className="w-4 h-4 text-primary shrink-0" />
             <span className="text-sm font-medium text-foreground">
@@ -123,7 +123,7 @@ function SearchTab() {
               </div>
               <Button
                 type="submit"
-                className="h-11 px-6 font-medium shadow-sm rounded-xl"
+                className="h-11 px-6 font-medium shadow-sm rounded-md"
                 disabled={!searchInput.trim() || isLoading}
                 data-testid="button-submit-search"
               >
@@ -154,7 +154,7 @@ function SearchTab() {
           <div className="space-y-3">
             <Skeleton className="h-5 w-44" />
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="overflow-hidden rounded-2xl">
+              <Card key={i} className="overflow-hidden rounded-md">
                 <CardContent className="p-5 flex flex-col gap-3">
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
@@ -174,7 +174,7 @@ function SearchTab() {
         )}
 
         {isError && (
-          <Card className="border-destructive/20 bg-destructive/5 shadow-sm rounded-2xl">
+          <Card className="border-destructive/20 bg-destructive/5 shadow-sm rounded-md">
             <CardContent className="p-5 flex items-start gap-4">
               <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
               <div>
@@ -233,7 +233,7 @@ function SearchTab() {
             </div>
 
             {data.results.length === 0 ? (
-              <Card className="border-dashed bg-muted/20 rounded-2xl">
+              <Card className="border-dashed bg-muted/20 rounded-md">
                 <CardContent className="flex flex-col items-center justify-center py-14 text-center px-4">
                   <AlertCircle className="w-10 h-10 text-muted-foreground/40 mb-3" />
                   <h3 className="text-base font-medium text-foreground mb-1.5">
@@ -261,7 +261,7 @@ function SearchTab() {
                   return (
                     <Card
                       key={`${doc.documentUrl}-${index}`}
-                      className="group hover:shadow-md transition-shadow duration-200 border-border/80 overflow-hidden rounded-2xl"
+                      className="group hover:shadow-md transition-shadow duration-200 border-border/80 overflow-hidden rounded-md"
                       data-testid={`card-result-${index}`}
                     >
                       <CardContent className="p-0">
@@ -350,7 +350,7 @@ function SearchTab() {
                             </div>
                             <Button
                               asChild
-                              className="w-full shadow-sm rounded-xl"
+                              className="w-full shadow-sm rounded-md"
                               variant="default"
                               size="sm"
                             >
@@ -391,7 +391,7 @@ function SearchTab() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded-xl"
+                        className="rounded-md"
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
                         data-testid="button-prev-page"
@@ -405,7 +405,7 @@ function SearchTab() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded-xl"
+                        className="rounded-md"
                         onClick={() => setPage((p) => p + 1)}
                         disabled={
                           page >= Math.ceil(data.totalCount / PAGE_SIZE)
@@ -439,7 +439,7 @@ export default function PilSearch() {
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
           <Tabs defaultValue="search" className="w-full">
-            <TabsList className="rounded-xl bg-muted/60 p-1 mb-6">
+            <TabsList className="rounded-md bg-muted/60 p-1 mb-6">
               <TabsTrigger
                 value="search"
                 className="rounded-lg gap-1.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"

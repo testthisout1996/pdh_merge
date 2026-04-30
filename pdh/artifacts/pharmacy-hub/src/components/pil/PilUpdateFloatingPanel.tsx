@@ -55,7 +55,7 @@ export function PilUpdateFloatingPanel() {
         <button
           onClick={() => setPanelMinimized(false)}
           title="Expand panel"
-          className="bg-background border border-border rounded-xl shadow-lg p-2.5 flex items-center justify-center hover:bg-muted transition-colors"
+          className="bg-background border border-border rounded-md shadow-lg p-2.5 flex items-center justify-center hover:bg-muted transition-colors"
         >
           {isRunning && !isPaused ? (
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
@@ -69,7 +69,7 @@ export function PilUpdateFloatingPanel() {
           <ChevronUp className="w-3.5 h-3.5 text-muted-foreground ml-1" />
         </button>
       ) : (
-        <div className="bg-background border border-border rounded-xl shadow-lg p-3 flex flex-col gap-2 min-w-[190px]">
+        <div className="bg-background border border-border rounded-md shadow-lg p-3 flex flex-col gap-2 min-w-[190px]">
           <div className="flex items-center justify-between gap-2 px-1 pb-2 border-b border-border mb-1">
             <div className="flex items-center gap-2 min-w-0">
               {isRunning ? (

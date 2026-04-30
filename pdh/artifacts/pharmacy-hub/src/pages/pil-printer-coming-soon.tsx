@@ -18,7 +18,7 @@ export default function PilPrinterComingSoon() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary/10 text-primary mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-md bg-primary/10 text-primary mb-6">
               <Printer className="w-10 h-10" />
             </div>
             <div className="inline-block bg-accent/20 text-accent-foreground text-[11px] font-bold uppercase tracking-widest py-1 px-3 rounded-full mb-3">
@@ -33,7 +33,7 @@ export default function PilPrinterComingSoon() {
             </p>
           </div>
 
-          <Card className="border-border/60 shadow-sm rounded-2xl">
+          <Card className="border-border/60 shadow-sm rounded-md">
             <CardContent className="p-6 md:p-8 space-y-6">
               <div>
                 <h2 className="text-base font-semibold text-foreground mb-3">
@@ -71,7 +71,7 @@ export default function PilPrinterComingSoon() {
 
               <div className="border-t border-border pt-5 flex flex-col sm:flex-row gap-3">
                 <Link href="/tools/pils/pil-search" className="flex-1">
-                  <Button className="w-full rounded-xl gap-2">
+                  <Button className="w-full rounded-md gap-2">
                     <Search className="w-4 h-4" />
                     Use PIL Search instead
                   </Button>
@@ -79,7 +79,7 @@ export default function PilPrinterComingSoon() {
                 <Link href="/" className="flex-1">
                   <Button
                     variant="outline"
-                    className="w-full rounded-xl gap-2"
+                    className="w-full rounded-md gap-2"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Back to home

@@ -222,7 +222,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
               >
                 <DropdownMenuItem
                   onClick={() => handleNavigate("tools")}
-                  className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group"
+                  className="rounded-md p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                     <Printer className="w-5 h-5" />
@@ -238,7 +238,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                 </DropdownMenuItem>
 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 data-[state=open]:bg-primary/5 transition-colors group mt-1 [&>svg]:hidden">
+                  <DropdownMenuSubTrigger className="rounded-md p-3 cursor-pointer gap-4 focus:bg-primary/5 data-[state=open]:bg-primary/5 transition-colors group mt-1 [&>svg]:hidden">
                     <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                       <Pill className="w-5 h-5" />
                     </div>
@@ -258,7 +258,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                       className="w-[280px] rounded-md p-2 shadow-xl border border-border/50 bg-white"
                     >
                       <Link href="/tools/pils/pil-printer">
-                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group">
+                        <DropdownMenuItem className="rounded-md p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group">
                           <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <Printer className="w-4 h-4" />
                           </div>
@@ -276,7 +276,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                         </DropdownMenuItem>
                       </Link>
                       <Link href="/tools/pils/pil-search">
-                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group mt-1">
+                        <DropdownMenuItem className="rounded-md p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group mt-1">
                           <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <Search className="w-4 h-4" />
                           </div>
@@ -295,7 +295,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                 </DropdownMenuSub>
 
                 <Link href="/tools/prednisolone-calculator">
-                  <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-secondary/10 mt-1 transition-colors group">
+                  <DropdownMenuItem className="rounded-md p-3 cursor-pointer gap-4 focus:bg-secondary/10 mt-1 transition-colors group">
                     <div className="w-10 h-10 rounded-full bg-secondary/20 text-secondary-foreground flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                       <Calculator className="w-5 h-5" />
                     </div>
@@ -309,7 +309,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
 
                 <DropdownMenuItem
                   disabled
-                  className="rounded-xl p-3 gap-4 mt-1 opacity-60 cursor-not-allowed"
+                  className="rounded-md p-3 gap-4 mt-1 opacity-60 cursor-not-allowed"
                 >
                   <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0">
                     <FileText className="w-5 h-5" />
@@ -378,7 +378,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                   <SheetClose asChild>
                     <button
                       onClick={() => handleNavigate("hero")}
-                      className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-xl hover:bg-muted transition-colors uppercase"
+                      className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-md hover:bg-muted transition-colors uppercase"
                     >
                       Home
                     </button>
@@ -392,7 +392,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                       <SheetClose asChild>
                         <button
                           onClick={() => handleNavigate("tools")}
-                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted text-left transition-colors"
+                          className="flex items-center gap-4 p-3 rounded-md hover:bg-muted text-left transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0">
                             <ArrowRight className="w-4 h-4" />
@@ -409,7 +409,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                       <SheetClose asChild>
                         <Link
                           href="/tools/pils/pil-printer"
-                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                          className="flex items-center gap-4 p-3 rounded-md hover:bg-primary/5 transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                             <Printer className="w-4 h-4" />
@@ -430,7 +430,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                       <SheetClose asChild>
                         <Link
                           href="/tools/pils/pil-search"
-                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                          className="flex items-center gap-4 p-3 rounded-md hover:bg-primary/5 transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                             <Search className="w-4 h-4" />
@@ -447,7 +447,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                       <SheetClose asChild>
                         <Link
                           href="/tools/prednisolone-calculator"
-                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-secondary/10 transition-colors mt-2"
+                          className="flex items-center gap-4 p-3 rounded-md hover:bg-secondary/10 transition-colors mt-2"
                         >
                           <div className="w-10 h-10 rounded-full bg-secondary/20 text-secondary-foreground flex items-center justify-center shrink-0">
                             <Calculator className="w-4 h-4" />
@@ -457,7 +457,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                           </span>
                         </Link>
                       </SheetClose>
-                      <div className="flex items-center gap-4 p-3 rounded-xl opacity-60 grayscale">
+                      <div className="flex items-center gap-4 p-3 rounded-md opacity-60 grayscale">
                         <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0">
                           <FileText className="w-4 h-4" />
                         </div>
@@ -476,7 +476,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                   <SheetClose asChild>
                     <button
                       onClick={() => handleNavigate("faq")}
-                      className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-xl hover:bg-muted transition-colors uppercase"
+                      className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-md hover:bg-muted transition-colors uppercase"
                     >
                       FAQ
                     </button>
@@ -484,7 +484,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                   <SheetClose asChild>
                     <button
                       onClick={() => handleNavigate("status")}
-                      className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-xl hover:bg-muted transition-colors uppercase"
+                      className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-md hover:bg-muted transition-colors uppercase"
                     >
                       Service Status
                     </button>
