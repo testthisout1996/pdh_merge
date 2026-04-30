@@ -61,7 +61,7 @@ function PilSearchHero({
   onTabChange: (tab: string) => void;
 }) {
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "340px" }}>
+    <div className="relative w-full overflow-hidden" style={{ height: "425px" }}>
       <img
         src={heroImage}
         alt="Pharmacy interior with staff and customers"
