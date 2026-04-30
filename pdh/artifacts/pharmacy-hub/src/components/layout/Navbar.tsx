@@ -255,7 +255,7 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent
                       sideOffset={12}
-                      className="w-[280px] rounded-2xl p-2 shadow-xl border border-border/50 bg-white"
+                      className="w-[280px] rounded-md p-2 shadow-xl border border-border/50 bg-white"
                     >
                       <Link href="/tools/pils/pil-printer">
                         <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group">
