@@ -502,11 +502,12 @@ export default function PilSearch() {
     const pilEl = pilToolsRef.current;
     if (!pilEl) return;
     const rect = pilEl.getBoundingClientRect();
-    // rect.top = viewport Y of PIL TOOLS when scroll=0
+    // rect.top = viewport Y of PIL TOOLS when scroll=0 (hero starts at y=0, no padding)
     // We want PIL TOOLS to end up at NAVBAR_H + GAP when locked
     lockAtRef.current = rect.top - (NAVBAR_H + GAP);
-    // When fixed, the hero's top = NAVBAR_H - lockAt (will be negative)
-    heroFixedTopRef.current = NAVBAR_H - lockAtRef.current;
+    // When hero is fixed, it should sit at exactly the scroll-shifted position.
+    // heroFixedTop = -(lockAt) keeps the hero at the same visual position at lock moment.
+    heroFixedTopRef.current = -lockAtRef.current;
   }, []);
 
   React.useEffect(() => {
@@ -526,7 +527,7 @@ export default function PilSearch() {
     >
       <Navbar />
 
-      <div style={{ paddingTop: NAVBAR_H }}>
+      <div>
         {/* Hero — switches to position:fixed when scroll threshold is reached */}
         <div
           style={
