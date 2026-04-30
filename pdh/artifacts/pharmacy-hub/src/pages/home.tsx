@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar, type ActiveSection } from "@/components/layout/Navbar";
+import ServiceStatusTab from "@/components/pil/ServiceStatusTab";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,15 +64,40 @@ const sectionVariants = {
   exit: { opacity: 0, y: -8 },
 };
 
+function getInitialSection(): ActiveSection {
+  if (typeof window === "undefined") return "hero";
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("section");
+  if (raw === "tools" || raw === "faq" || raw === "status" || raw === "report") {
+    return raw;
+  }
+  return "hero";
+}
+
 export default function Home() {
-  const [active, setActive] = React.useState<ActiveSection>("hero");
+  const [active, setActive] = React.useState<ActiveSection>(getInitialSection);
+  const [, setLocation] = useLocation();
 
   const handleNavigate = React.useCallback((section: ActiveSection) => {
     setActive(section);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
+      // Strip any ?section=… so refreshing the page lands on the same section
+      // without re-triggering an animation flash on the next visit.
+      if (window.location.search) {
+        window.history.replaceState({}, "", window.location.pathname);
+      }
     }
   }, []);
+
+  // Keep the active state in sync if the user clicks an in-page nav link that
+  // changes the URL (e.g. via wouter `setLocation`). Wouter listens to
+  // popstate, so this is just a defensive sync on mount.
+  React.useEffect(() => {
+    setActive(getInitialSection());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  void setLocation;
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
@@ -536,7 +562,7 @@ function ToolsSection() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Link href="/tools/pil-printer" className="w-full">
+                <Link href="/tools/pils/pil-search" className="w-full">
                   <Button className="w-full rounded-xl shadow-sm group-hover:bg-primary/90">
                     Launch Tool
                   </Button>
@@ -780,65 +806,7 @@ function StatusSection() {
             </p>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-            <div />
-            <div className="text-xs font-mono text-muted-foreground bg-white px-3 py-1.5 rounded-full border border-border shadow-sm">
-              Last checked: {new Date().toLocaleTimeString()}
-            </div>
-          </div>
-
-          <Card className="border-border/50 shadow-sm bg-white overflow-hidden">
-            <div className="bg-[#10B981]/10 px-6 py-4 border-b border-[#10B981]/20 flex items-center gap-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981] animate-pulse" />
-              <span className="font-medium text-[#047857]">
-                All core systems operational
-              </span>
-            </div>
-
-            <div className="divide-y divide-border/50">
-              <div className="px-6 py-4 flex items-center justify-between">
-                <span className="font-medium">Pharmacy Hub Platform</span>
-                <Badge
-                  variant="outline"
-                  className="bg-[#10B981]/10 text-[#047857] border-[#10B981]/20 gap-1.5 rounded-full px-3"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />{" "}
-                  Operational
-                </Badge>
-              </div>
-              <div className="px-6 py-4 flex items-center justify-between">
-                <span className="font-medium">PIL Printer</span>
-                <Badge
-                  variant="outline"
-                  className="bg-[#10B981]/10 text-[#047857] border-[#10B981]/20 gap-1.5 rounded-full px-3"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />{" "}
-                  Operational
-                </Badge>
-              </div>
-              <div className="px-6 py-4 flex items-center justify-between">
-                <span className="font-medium">Prednisolone Calculator</span>
-                <Badge
-                  variant="outline"
-                  className="bg-[#10B981]/10 text-[#047857] border-[#10B981]/20 gap-1.5 rounded-full px-3"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />{" "}
-                  Operational
-                </Badge>
-              </div>
-              <div className="px-6 py-4 flex items-center justify-between bg-muted/20">
-                <span className="font-medium text-muted-foreground">
-                  To-Follow Slip Generator
-                </span>
-                <Badge
-                  variant="outline"
-                  className="bg-accent/20 text-accent-foreground border-accent/30 gap-1.5 rounded-full px-3"
-                >
-                  <Clock className="w-3 h-3" /> Coming Soon
-                </Badge>
-              </div>
-            </div>
-          </Card>
+          <ServiceStatusTab />
         </motion.div>
       </div>
     </section>

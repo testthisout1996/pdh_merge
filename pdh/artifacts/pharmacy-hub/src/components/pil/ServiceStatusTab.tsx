@@ -186,13 +186,6 @@ export default function ServiceStatusTab() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground tracking-tight mb-1">Service Status</h2>
-        <p className="text-muted-foreground text-sm">
-          Real-time connectivity checks for each component of the PIL Finder service.
-        </p>
-      </div>
-
       {/* Overall Status Banner */}
       <Card className={`border shadow-sm ${overallCfg ? overallCfg.bannerClass : "border-border bg-muted/20"}`}>
         <CardContent className="p-5">

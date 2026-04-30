@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -11,11 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertCircle,
-  Printer,
-  ArrowLeft,
-  Tag,
   RefreshCw,
-  ServerCog,
+  Tag,
 } from "lucide-react";
 import {
   useSearchMhraPil,
@@ -27,9 +23,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import UpdateTab from "@/components/pil/UpdateTab";
-import ServiceStatusTab from "@/components/pil/ServiceStatusTab";
 import {
   parseNameAndBrand,
   buildSearchQuery,
@@ -431,39 +427,12 @@ function SearchTab() {
   );
 }
 
-export default function PilPrinter() {
+export default function PilSearch() {
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
-      {/* Tool header — uses PDH design tokens */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-border/60 shadow-sm">
-        <div className="container max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Printer className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-base md:text-lg font-bold text-foreground leading-tight tracking-tight truncate">
-                PIL Printer
-              </h1>
-              <p className="text-[11px] md:text-xs text-muted-foreground leading-tight truncate">
-                MHRA Patient Information Leaflets · UK
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[12px] md:text-[13px] font-semibold tracking-wide text-foreground/80 hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline uppercase tracking-widest text-[11px]">
-              Back to Hub
-            </span>
-            <span className="sm:hidden">Back</span>
-          </Link>
-        </div>
-      </header>
+      <Navbar />
 
-      <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
+      <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 pt-28 pb-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -487,14 +456,6 @@ export default function PilPrinter() {
                 <RefreshCw className="w-3.5 h-3.5" />
                 Bulk Update
               </TabsTrigger>
-              <TabsTrigger
-                value="status"
-                className="rounded-lg gap-1.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
-                data-testid="tab-status"
-              >
-                <ServerCog className="w-3.5 h-3.5" />
-                Service Status
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="search" className="focus-visible:outline-none">
@@ -502,9 +463,6 @@ export default function PilPrinter() {
             </TabsContent>
             <TabsContent value="update" className="focus-visible:outline-none">
               <UpdateTab />
-            </TabsContent>
-            <TabsContent value="status" className="focus-visible:outline-none">
-              <ServiceStatusTab />
             </TabsContent>
           </Tabs>
         </motion.div>

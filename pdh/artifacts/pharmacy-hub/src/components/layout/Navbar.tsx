@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import heroBg from "@/assets/hero-bg.png";
 import {
-  Cross,
   Menu,
   ChevronDown,
   Printer,
@@ -11,6 +10,8 @@ import {
   FileText,
   AlertTriangle,
   ArrowRight,
+  Pill,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
@@ -30,15 +35,30 @@ import {
 export type ActiveSection = "hero" | "tools" | "faq" | "status" | "report";
 
 interface NavbarProps {
-  active: ActiveSection;
-  onNavigate: (section: ActiveSection) => void;
+  /**
+   * The currently active section. Optional — when omitted (e.g. on tool pages
+   * that aren't the Home page) the Navbar derives the active state from the
+   * URL.
+   */
+  active?: ActiveSection;
+  /**
+   * Called when the user clicks a section link. Optional — when omitted, the
+   * Navbar will navigate to `/?section=<key>` so Home renders the right
+   * section.
+   */
+  onNavigate?: (section: ActiveSection) => void;
 }
 
-function Logo({ onNavigate }: { onNavigate: (section: ActiveSection) => void }) {
+function getActiveFromLocation(loc: string): ActiveSection {
+  if (loc.startsWith("/tools/pils") || loc.startsWith("/tools/")) return "tools";
+  return "hero";
+}
+
+function Logo({ onGoHome }: { onGoHome: () => void }) {
   return (
     <button
       type="button"
-      onClick={() => onNavigate("hero")}
+      onClick={onGoHome}
       className="relative flex items-center group shrink-0 text-left"
       aria-label="Pharmacy Dispensing Hub home"
     >
@@ -95,16 +115,34 @@ function NavLink({
   );
 }
 
-export function Navbar({ active, onNavigate }: NavbarProps) {
+export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
   const [scrolled, setScrolled] = React.useState(false);
+  const [location, setLocation] = useLocation();
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const active: ActiveSection = activeProp ?? getActiveFromLocation(location);
+
+  const handleNavigate = React.useCallback(
+    (section: ActiveSection) => {
+      if (onNavigate) {
+        onNavigate(section);
+        return;
+      }
+      // Cross-page navigation: send the user back to Home with the desired
+      // section. Home reads ?section=… to set its active section.
+      if (section === "hero") {
+        setLocation("/");
+      } else {
+        setLocation(`/?section=${section}`);
+      }
+    },
+    [onNavigate, setLocation],
+  );
 
   return (
     <motion.div
@@ -122,7 +160,7 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
       >
         <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 px-4 md:px-6 gap-4">
           <div className="justify-self-start">
-            <Logo onNavigate={onNavigate} />
+            <Logo onGoHome={() => handleNavigate("hero")} />
           </div>
 
           {/* Desktop Nav */}
@@ -130,15 +168,13 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
             <NavLink
               label="HOME"
               isActive={active === "hero"}
-              onClick={() => onNavigate("hero")}
+              onClick={() => handleNavigate("hero")}
             />
 
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={`flex items-center gap-1.5 text-[12px] font-semibold tracking-widest uppercase transition-colors focus:outline-none ${
-                  active === "tools"
-                    ? "text-primary"
-                    : "text-foreground/80 hover:text-primary"
+                  active === "tools" ? "text-primary" : "text-foreground/80 hover:text-primary"
                 }`}
               >
                 TOOLS <ChevronDown className="w-3.5 h-3.5 opacity-50" />
@@ -148,7 +184,7 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
                 className="w-[300px] rounded-2xl p-2 shadow-xl border-border/50 bg-white/95 backdrop-blur-xl"
               >
                 <DropdownMenuItem
-                  onClick={() => onNavigate("tools")}
+                  onClick={() => handleNavigate("tools")}
                   className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -164,18 +200,59 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
                   </div>
                 </DropdownMenuItem>
 
-                <Link href="/tools/pil-printer">
-                  <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group mt-1">
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 data-[state=open]:bg-primary/5 transition-colors group mt-1 [&>svg]:hidden">
                     <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <Printer className="w-5 h-5" />
+                      <Pill className="w-5 h-5" />
                     </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-sm text-foreground">
-                        Patient Information Leaflet Printer
+                    <div className="flex-1 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-sm text-foreground">PILs</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          Patient Information Leaflets
+                        </div>
                       </div>
+                      <ChevronDown className="w-3.5 h-3.5 -rotate-90 opacity-50" />
                     </div>
-                  </DropdownMenuItem>
-                </Link>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="w-[280px] rounded-2xl p-2 shadow-xl border-border/50 bg-white/95 backdrop-blur-xl ml-2">
+                      <Link href="/tools/pils/pil-search">
+                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                            <Search className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm text-foreground">
+                              PIL Search
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">
+                              Find official MHRA leaflets
+                            </div>
+                          </div>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/tools/pils/pil-printer">
+                        <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-primary/5 transition-colors group mt-1">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                            <Printer className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm text-foreground flex items-center gap-2">
+                              PIL Printer
+                              <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-sm">
+                                Coming Soon
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">
+                              Batch print MDS leaflets
+                            </div>
+                          </div>
+                        </DropdownMenuItem>
+                      </Link>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
 
                 <Link href="/tools/prednisolone-calculator">
                   <DropdownMenuItem className="rounded-xl p-3 cursor-pointer gap-4 focus:bg-secondary/10 mt-1 transition-colors group">
@@ -212,12 +289,12 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
             <NavLink
               label="FAQ"
               isActive={active === "faq"}
-              onClick={() => onNavigate("faq")}
+              onClick={() => handleNavigate("faq")}
             />
             <NavLink
               label="SERVICE STATUS"
               isActive={active === "status"}
-              onClick={() => onNavigate("status")}
+              onClick={() => handleNavigate("status")}
             />
           </nav>
 
@@ -255,12 +332,12 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
               >
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="p-6 border-b border-border/50">
-                  <Logo onNavigate={onNavigate} />
+                  <Logo onGoHome={() => handleNavigate("hero")} />
                 </div>
                 <div className="flex flex-col gap-2 p-4 overflow-y-auto flex-1">
                   <SheetClose asChild>
                     <button
-                      onClick={() => onNavigate("hero")}
+                      onClick={() => handleNavigate("hero")}
                       className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-xl hover:bg-muted transition-colors uppercase"
                     >
                       Home
@@ -274,7 +351,7 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
                     <div className="flex flex-col gap-1">
                       <SheetClose asChild>
                         <button
-                          onClick={() => onNavigate("tools")}
+                          onClick={() => handleNavigate("tools")}
                           className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted text-left transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0">
@@ -285,23 +362,52 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
                           </span>
                         </button>
                       </SheetClose>
+
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-4 pt-3 pb-1 flex items-center gap-1.5">
+                        <Pill className="w-3 h-3" /> PILs
+                      </div>
                       <SheetClose asChild>
                         <Link
-                          href="/tools/pil-printer"
+                          href="/tools/pils/pil-search"
+                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <Search className="w-4 h-4" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-sm">PIL Search</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              Find MHRA leaflets
+                            </span>
+                          </div>
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/tools/pils/pil-printer"
                           className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                             <Printer className="w-4 h-4" />
                           </div>
-                          <span className="font-semibold text-sm">
-                            PIL Printer
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-sm flex items-center gap-2">
+                              PIL Printer
+                              <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-sm">
+                                Soon
+                              </span>
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              Batch print MDS leaflets
+                            </span>
+                          </div>
                         </Link>
                       </SheetClose>
+
                       <SheetClose asChild>
                         <Link
                           href="/tools/prednisolone-calculator"
-                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-secondary/10 transition-colors"
+                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-secondary/10 transition-colors mt-2"
                         >
                           <div className="w-10 h-10 rounded-full bg-secondary/20 text-secondary-foreground flex items-center justify-center shrink-0">
                             <Calculator className="w-4 h-4" />
@@ -329,7 +435,7 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
 
                   <SheetClose asChild>
                     <button
-                      onClick={() => onNavigate("faq")}
+                      onClick={() => handleNavigate("faq")}
                       className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-xl hover:bg-muted transition-colors uppercase"
                     >
                       FAQ
@@ -337,7 +443,7 @@ export function Navbar({ active, onNavigate }: NavbarProps) {
                   </SheetClose>
                   <SheetClose asChild>
                     <button
-                      onClick={() => onNavigate("status")}
+                      onClick={() => handleNavigate("status")}
                       className="text-left text-[13px] tracking-widest font-semibold p-4 rounded-xl hover:bg-muted transition-colors uppercase"
                     >
                       Service Status

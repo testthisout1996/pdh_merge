@@ -5,7 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ToolPlaceholder from "@/pages/tool-placeholder";
-import PilPrinter from "@/pages/pil-printer";
+import PilSearch from "@/pages/pil-search";
+import PilPrinterComingSoon from "@/pages/pil-printer-coming-soon";
+import { PilUpdateProvider } from "@/context/PilUpdateContext";
+import { PilUpdateFloatingPanel } from "@/components/pil/PilUpdateFloatingPanel";
 
 const queryClient = new QueryClient();
 
@@ -13,9 +16,14 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/tools/pil-printer" component={PilPrinter} />
+      <Route path="/tools/pils/pil-search" component={PilSearch} />
+      <Route path="/tools/pils/pil-printer" component={PilPrinterComingSoon} />
+      {/* Legacy redirect-style routes */}
+      <Route path="/tools/pil-printer" component={PilSearch} />
       <Route path="/tools/prednisolone-calculator">
-        {() => <ToolPlaceholder toolName="Prednisolone Reducing Regimen Calculator" />}
+        {() => (
+          <ToolPlaceholder toolName="Prednisolone Reducing Regimen Calculator" />
+        )}
       </Route>
       <Route component={NotFound} />
     </Switch>
@@ -26,9 +34,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
+        <PilUpdateProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <PilUpdateFloatingPanel />
+        </PilUpdateProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
