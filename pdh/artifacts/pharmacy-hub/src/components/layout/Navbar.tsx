@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import heroBg from "@/assets/hero-bg.png";
 import {
   Menu,
   ChevronDown,
@@ -62,18 +61,12 @@ function Logo({ onGoHome }: { onGoHome: () => void }) {
       className="relative flex items-center group shrink-0 text-left"
       aria-label="Pharmacy Dispensing Hub home"
     >
+      {/* Invisible placeholder so the button reserves the same layout space
+          as the visible PDH cutout drawn by the navbar SVG. */}
       <span
-        className="text-4xl md:text-5xl leading-none tracking-tight select-none"
-        style={{
-          fontFamily: "var(--font-anton)",
-          backgroundImage: `url(${heroBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          WebkitBackgroundClip: "text",
-          backgroundClip: "text",
-          color: "transparent",
-          WebkitTextFillColor: "transparent",
-        }}
+        aria-hidden="true"
+        className="leading-none tracking-tight select-none invisible"
+        style={{ fontFamily: "var(--font-anton)", fontSize: "48px" }}
       >
         PDH
       </span>
@@ -120,6 +113,8 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
   const [location, setLocation] = useLocation();
   const [toolsOpen, setToolsOpen] = React.useState(false);
   const closeTimerRef = React.useRef<number | null>(null);
+  const reactId = React.useId();
+  const navbarMaskId = `navbar-pdh-mask-${reactId.replace(/[:]/g, "")}`;
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -181,13 +176,46 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
         }`}
       >
         <header
-          className={`pointer-events-auto w-full bg-white transition-all duration-300 ease-out ${
+          className={`pointer-events-auto relative w-full overflow-hidden transition-all duration-300 ease-out ${
             scrolled
               ? "max-w-none rounded-none border-x-0 border-t-0 border-b border-border/60 shadow-md shadow-black/5"
               : "max-w-6xl rounded-md border border-border/30 shadow-sm"
           }`}
         >
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 px-4 md:px-6 gap-4">
+          {/* Navbar background painted as an SVG so the PDH logo is a true
+              transparent cutout through the white bar. */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            aria-hidden="true"
+          >
+            <defs>
+              <mask id={navbarMaskId} maskUnits="userSpaceOnUse">
+                <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                <text
+                  x="24"
+                  y="50%"
+                  dominantBaseline="central"
+                  fill="black"
+                  style={{
+                    fontFamily: "var(--font-anton)",
+                    fontSize: "48px",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  PDH
+                </text>
+              </mask>
+            </defs>
+            <rect
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              fill="white"
+              mask={`url(#${navbarMaskId})`}
+            />
+          </svg>
+        <div className="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center h-16 px-6 gap-4">
           <div className="justify-self-start">
             <Logo onGoHome={() => handleNavigate("hero")} />
           </div>

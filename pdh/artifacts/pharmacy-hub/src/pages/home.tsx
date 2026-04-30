@@ -43,7 +43,6 @@ import {
   Pause,
   Play,
 } from "lucide-react";
-import heroBg from "@/assets/hero-bg.png";
 const HERO_VIDEOS = [
   `${import.meta.env.BASE_URL}media/hero-bg.mp4`,
   `${import.meta.env.BASE_URL}media/hero-bg-2.mp4`,
@@ -323,7 +322,6 @@ function HeroVideoCarousel({ isPaused }: { isPaused: boolean }) {
             refs.current[i] = el;
           }}
           src={src}
-          poster={heroBg}
           autoPlay={i === 0}
           loop
           muted
