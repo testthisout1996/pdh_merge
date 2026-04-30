@@ -214,6 +214,23 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
               fill="white"
               mask={`url(#${navbarMaskId})`}
             />
+            {/* Thin outline drawn on top of the cutout so the PDH letters
+                remain legible regardless of what shows through. */}
+            <text
+              x="24"
+              y="50%"
+              dominantBaseline="central"
+              fill="none"
+              stroke="rgba(44, 27, 61, 0.55)"
+              strokeWidth="1"
+              style={{
+                fontFamily: "var(--font-anton)",
+                fontSize: "48px",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              PDH
+            </text>
           </svg>
         <div className="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center h-16 px-6 gap-4">
           <div className="justify-self-start">
