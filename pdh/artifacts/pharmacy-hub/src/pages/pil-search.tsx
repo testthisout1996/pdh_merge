@@ -493,36 +493,59 @@ const HERO_H = 425;    // hero section height
 
 export default function PilSearch() {
   const [activeTab, setActiveTab] = React.useState("search");
-  const [heroLocked, setHeroLocked] = React.useState(false);
 
   const pageRef = React.useRef<HTMLDivElement>(null);
+  const heroWrapperRef = React.useRef<HTMLDivElement>(null);
+  const spacerRef = React.useRef<HTMLDivElement>(null);
   const pilToolsRef = React.useRef<HTMLParagraphElement>(null);
   const lockAtRef = React.useRef<number>(0);
   const heroFixedTopRef = React.useRef<number>(0);
-  const heroLockedRef = React.useRef<boolean>(false);
+  const isLockedRef = React.useRef<boolean>(false);
 
   React.useEffect(() => {
     const page = pageRef.current;
-    if (!page) return;
+    const heroEl = heroWrapperRef.current;
+    const spacerEl = spacerRef.current;
+    if (!page || !heroEl || !spacerEl) return;
+
     const onScroll = () => {
       const scrollTop = page.scrollTop;
       const pilEl = pilToolsRef.current;
 
-      // While unlocked: recalculate the lock threshold every frame so the
-      // measurement reflects the element's true settled position (unaffected
-      // by the mount animation's initial y-offset).
-      if (!heroLockedRef.current && pilEl) {
+      // While unlocked: recalculate lock threshold every frame so it reflects
+      // the element's true settled position after the mount animation finishes.
+      if (!isLockedRef.current && pilEl) {
         const rect = pilEl.getBoundingClientRect();
-        // rect.top + scrollTop = PIL TOOLS position relative to scroll container top
         const pilToolsDomY = rect.top + scrollTop;
         lockAtRef.current = pilToolsDomY - LOCK_TARGET_Y;
         heroFixedTopRef.current = -lockAtRef.current;
       }
 
       const shouldLock = lockAtRef.current > 0 && scrollTop >= lockAtRef.current;
-      heroLockedRef.current = shouldLock;
-      setHeroLocked(shouldLock);
+
+      // Only act on a change — and write directly to the DOM so both the hero
+      // position and spacer height update atomically in the same paint frame,
+      // eliminating the jitter caused by React re-renders.
+      if (shouldLock !== isLockedRef.current) {
+        isLockedRef.current = shouldLock;
+        if (shouldLock) {
+          heroEl.style.position = "fixed";
+          heroEl.style.top = `${heroFixedTopRef.current}px`;
+          heroEl.style.left = "0";
+          heroEl.style.right = "0";
+          heroEl.style.zIndex = "30";
+          spacerEl.style.height = `${HERO_H}px`;
+        } else {
+          heroEl.style.position = "";
+          heroEl.style.top = "";
+          heroEl.style.left = "";
+          heroEl.style.right = "";
+          heroEl.style.zIndex = "";
+          spacerEl.style.height = "0px";
+        }
+      }
     };
+
     page.addEventListener("scroll", onScroll, { passive: true });
     return () => page.removeEventListener("scroll", onScroll);
   }, []);
@@ -535,20 +558,7 @@ export default function PilSearch() {
       <Navbar />
 
       <div>
-        {/* Hero — switches to position:fixed when scroll threshold is reached */}
-        <div
-          style={
-            heroLocked
-              ? {
-                  position: "fixed",
-                  top: heroFixedTopRef.current,
-                  left: 0,
-                  right: 0,
-                  zIndex: 30,
-                }
-              : {}
-          }
-        >
+        <div ref={heroWrapperRef}>
           <PilSearchHero
             pilToolsRef={pilToolsRef}
             activeTab={activeTab}
@@ -556,8 +566,8 @@ export default function PilSearch() {
           />
         </div>
 
-        {/* Spacer keeps the content from jumping up when hero leaves the flow */}
-        {heroLocked && <div style={{ height: HERO_H }} />}
+        {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock */}
+        <div ref={spacerRef} style={{ height: 0 }} />
 
         <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
           <motion.div
