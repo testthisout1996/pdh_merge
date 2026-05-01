@@ -621,7 +621,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
             aria-label="Back to top"
             style={{
               backgroundImage: `linear-gradient(rgba(44,27,61,0.72), rgba(44,27,61,0.72)), url(${heroImage})`,
-              backgroundSize: "cover",
+              backgroundSize: "auto",
               backgroundPosition: "center",
             }}
             className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-md flex items-center justify-center border border-white/30 text-white hover:brightness-110 transition-[filter] duration-200 shadow-md cursor-pointer"
