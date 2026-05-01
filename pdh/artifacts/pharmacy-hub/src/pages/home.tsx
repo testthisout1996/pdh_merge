@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar, type ActiveSection } from "@/components/layout/Navbar";
 import ServiceStatusTab from "@/components/pil/ServiceStatusTab";
+import statusHeroImage from "@assets/service-status-hero.webp";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -787,23 +788,56 @@ function FAQSection() {
 
 function StatusSection() {
   return (
-    <section id="status" className="py-20 bg-background">
-      <div className="container max-w-4xl mx-auto px-4">
+    <section id="status" className="bg-background">
+      {/* Hero banner — mirrors the PIL Search hero layout */}
+      <div className="relative w-full overflow-hidden" style={{ height: "340px" }}>
+        <img
+          src={statusHeroImage}
+          alt="Pharmacist helping a patient in a pharmacy"
+          className="absolute w-full object-cover object-center"
+          style={{
+            filter: "saturate(0.9)",
+            height: "130%",
+            top: "-15%",
+          }}
+        />
+        {/* Left-to-right dark tint — matches PIL Search */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
+        {/* Bottom vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
+
+        <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          >
+            <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">
+              System Health
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
+              Service Status
+            </h2>
+            <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed">
+              Monitor the live operational health of the Pharmacy Dispensing Hub
+              and all its connected services. View real-time availability of the
+              PIL search tools, MHRA data feeds, and the PDH web application —
+              all in one place. Status checks run automatically on page load and
+              can be refreshed at any time.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Status content below hero */}
+      <div className="container max-w-4xl mx-auto px-4 py-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
-              Service Status
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Live operational status of the Pharmacy Hub and its tools.
-            </p>
-          </div>
-
           <ServiceStatusTab />
         </motion.div>
       </div>
