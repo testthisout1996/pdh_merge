@@ -72,20 +72,18 @@ function PilSearchHero({
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
-      {/* Fade-out to page background at the bottom — OKLab interpolation prevents banding */}
+      {/* Edge blend — tight fade at the very bottom so the hero melts into the page */}
       <div
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{
-          height: "180px",
+          height: "72px",
           background: `linear-gradient(to bottom in oklab,
             hsl(268 18% 98% / 0)    0%,
-            hsl(268 18% 98% / 0.06) 20%,
-            hsl(268 18% 98% / 0.18) 38%,
-            hsl(268 18% 98% / 0.38) 55%,
-            hsl(268 18% 98% / 0.60) 70%,
-            hsl(268 18% 98% / 0.78) 83%,
-            hsl(268 18% 98% / 0.90) 93%,
-            hsl(268 18% 98% / 0.95) 100%
+            hsl(268 18% 98% / 0.04) 25%,
+            hsl(268 18% 98% / 0.18) 50%,
+            hsl(268 18% 98% / 0.52) 72%,
+            hsl(268 18% 98% / 0.82) 88%,
+            hsl(268 18% 98% / 0.96) 100%
           )`,
         }}
       />
