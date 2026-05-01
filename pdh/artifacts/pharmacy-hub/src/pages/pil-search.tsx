@@ -603,14 +603,14 @@ export default function PilSearch() {
           top: 0,
           left: 0,
           right: 0,
-          height: `${NAVBAR_BOTTOM + 24}px`,
+          height: `${NAVBAR_BOTTOM}px`,
           zIndex: 40,
           pointerEvents: "none",
           opacity: 0,
           backdropFilter: "blur(0px)",
           WebkitBackdropFilter: "blur(0px)",
-          maskImage: `linear-gradient(to bottom, black 0%, black 55%, transparent 100%)`,
-          WebkitMaskImage: `linear-gradient(to bottom, black 0%, black 55%, transparent 100%)`,
+          maskImage: `linear-gradient(to bottom, black 0%, black 60%, transparent 100%)`,
+          WebkitMaskImage: `linear-gradient(to bottom, black 0%, black 60%, transparent 100%)`,
         } as React.CSSProperties}
       />
 
