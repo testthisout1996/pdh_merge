@@ -72,8 +72,23 @@ function PilSearchHero({
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
-      {/* Fade-out to page background at the bottom — subtle and gradual */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-background/40 pointer-events-none" />
+      {/* Fade-out to page background at the bottom — OKLab interpolation prevents banding */}
+      <div
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: "180px",
+          background: `linear-gradient(to bottom in oklab,
+            hsl(268 18% 98% / 0)    0%,
+            hsl(268 18% 98% / 0.06) 20%,
+            hsl(268 18% 98% / 0.18) 38%,
+            hsl(268 18% 98% / 0.38) 55%,
+            hsl(268 18% 98% / 0.60) 70%,
+            hsl(268 18% 98% / 0.78) 83%,
+            hsl(268 18% 98% / 0.90) 93%,
+            hsl(268 18% 98% / 0.95) 100%
+          )`,
+        }}
+      />
 
       <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
         <motion.div
@@ -568,10 +583,12 @@ export default function PilSearch() {
           />
         </div>
 
-        {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock */}
-        <div ref={spacerRef} style={{ height: 0 }} />
+        {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock.
+            paddingBottom provides a permanent gap between hero bottom and content, regardless
+            of locked state, without causing a jump at lock time. */}
+        <div ref={spacerRef} style={{ height: 0, paddingBottom: "16px" }} />
 
-        <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 pt-10 pb-8">
+        <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
