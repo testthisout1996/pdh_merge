@@ -2,7 +2,9 @@ import * as React from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar, type ActiveSection } from "@/components/layout/Navbar";
-import ServiceStatusTab from "@/components/pil/ServiceStatusTab";
+import ServiceStatusTab, {
+  type ServiceStatusTabHandle,
+} from "@/components/pil/ServiceStatusTab";
 import statusHeroImage from "@assets/service-status-hero.webp";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -43,6 +45,11 @@ import {
   ArrowLeft,
   Pause,
   Play,
+  RefreshCw,
+  Activity,
+  Layers,
+  Key,
+  Loader2,
 } from "lucide-react";
 const HERO_VIDEOS = [
   `${import.meta.env.BASE_URL}media/hero-bg.mp4`,
@@ -785,51 +792,253 @@ function FAQSection() {
 
 /* ─────────────────────────── STATUS ─────────────────────────── */
 
+const ST_NAVBAR_TOP_GAP = 16;
+const ST_NAVBAR_BAR_H = 64;
+const ST_NAVBAR_BOTTOM = ST_NAVBAR_TOP_GAP + ST_NAVBAR_BAR_H; // 80px
+const ST_GAP = 4;
+const ST_LOCK_TARGET_Y = ST_NAVBAR_BOTTOM + ST_GAP; // 84px
+const ST_HERO_H = 531;
+const ST_BLUR_MAX = 10;
+const ST_PARALLAX = 0.2;
+
 function StatusSection() {
+  const serviceStatusRef = React.useRef<ServiceStatusTabHandle>(null);
+  const heroWrapperRef = React.useRef<HTMLDivElement>(null);
+  const spacerRef = React.useRef<HTMLDivElement>(null);
+  const buttonsRef = React.useRef<HTMLDivElement>(null);
+  const heroImgRef = React.useRef<HTMLImageElement>(null);
+  const blurLayerRef = React.useRef<HTMLDivElement>(null);
+  const lockAtRef = React.useRef<number>(0);
+  const heroFixedTopRef = React.useRef<number>(0);
+  const isLockedRef = React.useRef<boolean>(false);
+  const [activeBtn, setActiveBtn] = React.useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const scrollToSection = React.useCallback((id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const lock = lockAtRef.current;
+    const heroFixed = heroFixedTopRef.current;
+    const heroBottomViewport = heroFixed + ST_HERO_H;
+    const elDocY = el.getBoundingClientRect().top + window.scrollY;
+    const targetViewportY = heroBottomViewport + 16;
+    const targetScroll =
+      lock > 0
+        ? Math.max(lock, elDocY - targetViewportY)
+        : Math.max(0, elDocY - ST_HERO_H - 16);
+    window.scrollTo({ top: targetScroll, behavior: "smooth" });
+  }, []);
+
+  const handleRefreshAll = React.useCallback(() => {
+    setIsRefreshing(true);
+    serviceStatusRef.current?.refreshAll();
+    setTimeout(() => setIsRefreshing(false), 1500);
+  }, []);
+
+  React.useEffect(() => {
+    const heroEl = heroWrapperRef.current;
+    const spacerEl = spacerRef.current;
+    if (!heroEl || !spacerEl) return;
+
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const btnEl = buttonsRef.current;
+      const imgEl = heroImgRef.current;
+
+      if (!isLockedRef.current && btnEl) {
+        const rect = btnEl.getBoundingClientRect();
+        const btnsDomY = rect.top + scrollTop;
+        lockAtRef.current = btnsDomY - ST_LOCK_TARGET_Y;
+        heroFixedTopRef.current = -lockAtRef.current;
+      }
+
+      const shouldLock =
+        lockAtRef.current > 0 && scrollTop >= lockAtRef.current;
+
+      if (imgEl) {
+        const shift = Math.min(
+          scrollTop,
+          lockAtRef.current > 0 ? lockAtRef.current : scrollTop,
+        );
+        imgEl.style.transform = `translateY(${shift * ST_PARALLAX}px)`;
+      }
+
+      const blurEl = blurLayerRef.current;
+      if (blurEl) {
+        const progress =
+          lockAtRef.current > 0
+            ? Math.min(1, scrollTop / lockAtRef.current)
+            : 0;
+        const blurPx = (progress * ST_BLUR_MAX).toFixed(2);
+        blurEl.style.backdropFilter = `blur(${blurPx}px)`;
+        (
+          blurEl.style as CSSStyleDeclaration & {
+            webkitBackdropFilter: string;
+          }
+        ).webkitBackdropFilter = `blur(${blurPx}px)`;
+        blurEl.style.opacity = String(progress);
+      }
+
+      if (shouldLock !== isLockedRef.current) {
+        isLockedRef.current = shouldLock;
+        if (shouldLock) {
+          heroEl.style.position = "fixed";
+          heroEl.style.top = `${heroFixedTopRef.current}px`;
+          heroEl.style.left = "0";
+          heroEl.style.right = "0";
+          heroEl.style.zIndex = "30";
+          spacerEl.style.height = `${ST_HERO_H}px`;
+        } else {
+          heroEl.style.position = "";
+          heroEl.style.top = "";
+          heroEl.style.left = "";
+          heroEl.style.right = "";
+          heroEl.style.zIndex = "";
+          spacerEl.style.height = "0px";
+        }
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <section id="status" className="bg-background">
-      {/* Hero banner — mirrors the PIL Search hero layout */}
-      <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
-        <img
-          src={statusHeroImage}
-          alt="Pharmacist helping a patient in a pharmacy"
-          className="absolute w-full object-cover object-center"
-          style={{
-            filter: "saturate(0.9)",
-            height: "130%",
-            top: "-15%",
-          }}
-        />
-        {/* Left-to-right dark tint — matches PIL Search */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
-        {/* Bottom vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
+      {/* Blur overlay — above hero (z-30), below navbar (z-50) */}
+      <div
+        ref={blurLayerRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: `${ST_NAVBAR_BOTTOM}px`,
+          zIndex: 40,
+          pointerEvents: "none",
+          opacity: 0,
+          backdropFilter: "blur(0px)",
+          WebkitBackdropFilter: "blur(0px)",
+          maskImage:
+            "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+        } as React.CSSProperties}
+      />
 
-        <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          >
-            <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">
-              System Health
-            </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
-              Service Status
-            </h2>
-            <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed">
-              Monitor the live operational health of the Pharmacy Dispensing Hub
-              and all its connected services. View real-time availability of the
-              PIL search tools, MHRA data feeds, and the PDH web application —
-              all in one place. Status checks run automatically on page load and
-              can be refreshed at any time.
-            </p>
-          </motion.div>
+      {/* Hero wrapper — becomes position:fixed when scroll locks */}
+      <div ref={heroWrapperRef}>
+        <div
+          className="relative w-full overflow-hidden"
+          style={{ height: `${ST_HERO_H}px` }}
+        >
+          <img
+            ref={heroImgRef}
+            src={statusHeroImage}
+            alt="Pharmacist helping a patient in a pharmacy"
+            className="absolute w-full object-cover object-center"
+            style={{
+              filter: "saturate(0.9)",
+              height: "130%",
+              top: "-15%",
+              willChange: "transform",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
+
+          <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.55,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.1,
+              }}
+            >
+              <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">
+                System Health
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
+                Service Status
+              </h2>
+              <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed mb-6">
+                Monitor the live operational health of the Pharmacy Dispensing
+                Hub and all its connected services. View real-time availability
+                of the PIL search tools, MHRA data feeds, and the PDH web
+                application — all in one place. Status checks run automatically
+                on page load and can be refreshed at any time.
+              </p>
+
+              <div
+                ref={buttonsRef}
+                className="flex items-center gap-3 flex-wrap"
+              >
+                <button
+                  onClick={handleRefreshAll}
+                  disabled={isRefreshing}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 bg-white/15 text-white border border-white/30 hover:bg-white/25 disabled:opacity-60"
+                >
+                  {isRefreshing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  Refresh All
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveBtn("all-systems");
+                    scrollToSection("status-all-systems");
+                  }}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                    activeBtn === "all-systems"
+                      ? "bg-white text-[#2c1b3d] shadow-md"
+                      : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                  }`}
+                >
+                  <Activity className="w-4 h-4" />
+                  All Systems
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveBtn("tools");
+                    scrollToSection("status-tools");
+                  }}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                    activeBtn === "tools"
+                      ? "bg-white text-[#2c1b3d] shadow-md"
+                      : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                  }`}
+                >
+                  <Layers className="w-4 h-4" />
+                  Tools
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveBtn("status-key");
+                    scrollToSection("status-key");
+                  }}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                    activeBtn === "status-key"
+                      ? "bg-white text-[#2c1b3d] shadow-md"
+                      : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                  }`}
+                >
+                  <Key className="w-4 h-4" />
+                  Status Key
+                </button>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Status content below hero */}
+      {/* Spacer — height driven imperatively in the same paint frame as the lock */}
+      <div ref={spacerRef} style={{ height: 0 }} />
+
+      {/* Status content */}
       <div className="container max-w-4xl mx-auto px-4 py-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -837,7 +1046,7 @@ function StatusSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <ServiceStatusTab />
+          <ServiceStatusTab ref={serviceStatusRef} />
         </motion.div>
       </div>
     </section>

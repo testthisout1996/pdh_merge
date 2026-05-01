@@ -1,4 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import {
   RefreshCw,
   CheckCircle2,
@@ -259,7 +265,12 @@ async function fetchAllBackend(): Promise<{
   }
 }
 
-export default function ServiceStatusTab() {
+export interface ServiceStatusTabHandle {
+  refreshAll: () => void;
+}
+
+const ServiceStatusTab = forwardRef<ServiceStatusTabHandle>(
+  function ServiceStatusTab(_, ref) {
   const [results, setResults] =
     useState<Record<ComponentKey, ComponentResult>>(INITIAL_RESULTS);
   const [overallCheckedAt, setOverallCheckedAt] = useState<string>("");
@@ -316,6 +327,8 @@ export default function ServiceStatusTab() {
   useEffect(() => {
     void refreshAll();
   }, [refreshAll]);
+
+  useImperativeHandle(ref, () => ({ refreshAll }));
 
   const refreshComponent = useCallback(async (key: ComponentKey) => {
     setLoadingComponent((prev) => ({ ...prev, [key]: true }));
@@ -381,6 +394,7 @@ export default function ServiceStatusTab() {
     <div className="space-y-6">
       {/* Overall Status — expandable */}
       <Card
+        id="status-all-systems"
         className={`border shadow-sm overflow-hidden ${
           overallCfg ? overallCfg.bannerClass : "border-border bg-muted/20"
         }`}
@@ -490,7 +504,7 @@ export default function ServiceStatusTab() {
       </Card>
 
       {/* Per-tool sections */}
-      <div className="space-y-3">
+      <div id="status-tools" className="space-y-3">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
           Tools &amp; Components
         </h3>
@@ -705,7 +719,7 @@ export default function ServiceStatusTab() {
       </div>
 
       {/* Status Key */}
-      <Card className="border-border/60 bg-muted/20 shadow-sm">
+      <Card id="status-key" className="border-border/60 bg-muted/20 shadow-sm">
         <CardHeader className="pb-2 pt-4 px-5">
           <CardTitle className="text-sm font-semibold text-foreground/80 uppercase tracking-wider">
             Status Key
@@ -756,4 +770,7 @@ export default function ServiceStatusTab() {
       </Card>
     </div>
   );
-}
+  },
+);
+
+export default ServiceStatusTab;
