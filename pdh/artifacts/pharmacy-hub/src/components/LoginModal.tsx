@@ -87,67 +87,85 @@ export function LoginModal() {
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-sm overflow-hidden rounded-md border border-border/30 shadow-md bg-white"
           >
-            {/* Header bar — PDH logo left, title right, same look as navbar */}
-            <div className="relative overflow-hidden h-16 flex items-center px-5 gap-4 border-b border-border/20">
-              {/* SVG background — white fill with PDH punched through (same technique as navbar) */}
-              <svg
-                className="absolute inset-0 w-full h-full pointer-events-none"
+            {/* Header bar — pharmacy image background, PDH logo left, title right */}
+            <div className="relative overflow-hidden h-20 flex items-center px-5 gap-4">
+              {/* Pharmacy background image */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: "url(/pharmacy-bg.jpg)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center 35%",
+                }}
                 aria-hidden="true"
-              >
-                <defs>
-                  <mask id={maskId} maskUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                    <text
-                      x="20"
-                      y="50%"
-                      dominantBaseline="central"
-                      fill="black"
-                      style={{
-                        fontFamily: "var(--font-anton)",
-                        fontSize: "48px",
-                        letterSpacing: "-0.02em",
-                      }}
-                    >
-                      PDH
-                    </text>
-                  </mask>
-                </defs>
-                {/* White panel with PDH cutout */}
-                <rect
-                  x="0"
-                  y="0"
-                  width="100%"
-                  height="100%"
-                  fill="white"
-                  mask={`url(#${maskId})`}
-                />
-                {/* Thin outline on the PDH text so it stays legible */}
-                <text
-                  x="20"
-                  y="50%"
-                  dominantBaseline="central"
-                  fill="none"
-                  stroke="rgba(44,27,61,0.45)"
-                  strokeWidth="0.8"
-                  style={{
-                    fontFamily: "var(--font-anton)",
-                    fontSize: "48px",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  PDH
-                </text>
-              </svg>
+              />
+              {/* Dark gradient overlay so text stays legible */}
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-[hsl(260,40%,15%)]/80 via-[hsl(260,40%,15%)]/65 to-[hsl(260,40%,15%)]/50"
+                aria-hidden="true"
+              />
 
-              {/* Invisible spacer that matches the PDH text width so content flows to its right */}
-              <div className="relative z-10 shrink-0 w-[72px]" aria-hidden="true" />
+              {/* PDH logo — same SVG cutout technique as navbar, but on the dark image background
+                  so the cutout reveals the image through the letters */}
+              <div className="relative z-10 shrink-0 h-12 w-[72px] overflow-hidden rounded-md">
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <mask id={maskId} maskUnits="userSpaceOnUse">
+                      <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                      <text
+                        x="50%"
+                        y="50%"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill="black"
+                        style={{
+                          fontFamily: "var(--font-anton)",
+                          fontSize: "26px",
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        PDH
+                      </text>
+                    </mask>
+                  </defs>
+                  {/* White fill with PDH punched out — reveals image behind */}
+                  <rect
+                    x="0"
+                    y="0"
+                    width="100%"
+                    height="100%"
+                    fill="white"
+                    mask={`url(#${maskId})`}
+                  />
+                  {/* Thin outline keeps letters legible */}
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="none"
+                    stroke="rgba(44,27,61,0.4)"
+                    strokeWidth="0.6"
+                    style={{
+                      fontFamily: "var(--font-anton)",
+                      fontSize: "26px",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    PDH
+                  </text>
+                </svg>
+              </div>
 
               {/* Title + subtitle to the right of the logo */}
               <div className="relative z-10 flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground leading-tight truncate">
+                <p className="text-sm font-semibold text-white leading-tight truncate">
                   Pharmacy Dispensing Hub
                 </p>
-                <p className="text-[11px] text-muted-foreground">Staff access</p>
+                <p className="text-[11px] text-white/70">Staff access</p>
               </div>
 
               {/* Close button — only when not triggered by a protected route */}
@@ -155,7 +173,7 @@ export function LoginModal() {
                 <button
                   type="button"
                   onClick={closeLoginModal}
-                  className="relative z-10 shrink-0 w-7 h-7 rounded-md bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
+                  className="relative z-10 shrink-0 w-7 h-7 rounded-md bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
                   aria-label="Close"
                 >
                   <X className="w-3.5 h-3.5" />
