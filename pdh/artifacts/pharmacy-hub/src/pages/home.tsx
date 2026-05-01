@@ -155,7 +155,6 @@ export default function Home() {
               animate="animate"
               exit="exit"
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="pt-28"
             >
               <StatusSection />
             </motion.div>
@@ -790,7 +789,7 @@ function StatusSection() {
   return (
     <section id="status" className="bg-background">
       {/* Hero banner — mirrors the PIL Search hero layout */}
-      <div className="relative w-full overflow-hidden" style={{ height: "340px" }}>
+      <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
         <img
           src={statusHeroImage}
           alt="Pharmacist helping a patient in a pharmacy"
