@@ -7,22 +7,59 @@ import Home from "@/pages/home";
 import ToolPlaceholder from "@/pages/tool-placeholder";
 import PilSearch from "@/pages/pil-search";
 import PilPrinterComingSoon from "@/pages/pil-printer-coming-soon";
+import Login from "@/pages/Login";
+import Admin from "@/pages/Admin";
 import { PilUpdateProvider } from "@/context/PilUpdateContext";
 import { PilUpdateFloatingPanel } from "@/components/pil/PilUpdateFloatingPanel";
+import { AuthProvider } from "@/context/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/tools/pils/pil-search" component={PilSearch} />
-      <Route path="/tools/pils/pil-printer" component={PilPrinterComingSoon} />
-      {/* Legacy redirect-style routes */}
-      <Route path="/tools/pil-printer" component={PilSearch} />
+      <Route path="/login" component={Login} />
+      <Route path="/admin">
+        {() => (
+          <ProtectedRoute requiredRole={["admin", "superadmin"]}>
+            <Admin />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/">
+        {() => (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/tools/pils/pil-search">
+        {() => (
+          <ProtectedRoute>
+            <PilSearch />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/tools/pils/pil-printer">
+        {() => (
+          <ProtectedRoute>
+            <PilPrinterComingSoon />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/tools/pil-printer">
+        {() => (
+          <ProtectedRoute>
+            <PilSearch />
+          </ProtectedRoute>
+        )}
+      </Route>
       <Route path="/tools/prednisolone-calculator">
         {() => (
-          <ToolPlaceholder toolName="Prednisolone Reducing Regimen Calculator" />
+          <ProtectedRoute>
+            <ToolPlaceholder toolName="Prednisolone Reducing Regimen Calculator" />
+          </ProtectedRoute>
         )}
       </Route>
       <Route component={NotFound} />
@@ -34,13 +71,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <PilUpdateProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <PilUpdateFloatingPanel />
-        </PilUpdateProvider>
-        <Toaster />
+        <AuthProvider>
+          <PilUpdateProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+            <PilUpdateFloatingPanel />
+          </PilUpdateProvider>
+          <Toaster />
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

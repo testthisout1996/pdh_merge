@@ -1,0 +1,14 @@
+[
+  {
+    "id": "dd5c8fab-6ba8-40ab-8aee-a94cc560d1c8",
+    "name": "Super Admin",
+    "pin": "1111",
+    "role": "superadmin"
+  },
+  {
+    "id": "36998b91-43bf-481b-9e90-6f8f057d9c48",
+    "name": "Administrator",
+    "pin": "9999",
+    "role": "admin"
+  }
+]

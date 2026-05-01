@@ -7,11 +7,15 @@ import {
   Printer,
   Calculator,
   FileText,
-  AlertTriangle,
   ArrowRight,
   ArrowUp,
   Pill,
   Search,
+  LogOut,
+  ShieldCheck,
+  Crown,
+  User,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@assets/pil-hero.webp";
@@ -24,6 +28,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuPortal,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
@@ -32,6 +37,7 @@ import {
   SheetTitle,
   SheetClose,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/context/AuthContext";
 
 export type ActiveSection = "hero" | "tools" | "faq" | "status" | "report";
 
@@ -123,6 +129,9 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
   const closeTimerRef = React.useRef<number | null>(null);
   const reactId = React.useId();
   const navbarMaskId = `navbar-pdh-mask-${reactId.replace(/[:]/g, "")}`;
+  const { user, logout } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const isSuperAdmin = user?.role === "superadmin";
 
   React.useEffect(() => {
     const container = scrollContainerRef?.current ?? null;
@@ -434,19 +443,48 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
           </nav>
 
           {/* Right Cluster */}
-          <div className="hidden md:flex items-center gap-3 shrink-0 justify-self-end">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Reporting is currently unavailable"
-              className="flex items-center gap-3 bg-[hsl(260_40%_25%)] text-white pl-5 pr-1.5 py-1.5 rounded-md text-xs font-bold tracking-wider opacity-50 cursor-not-allowed"
-            >
-              REPORT AN ISSUE
-              <div className="w-7 h-7 rounded-sm bg-white/80 text-[hsl(260_40%_25%)] flex items-center justify-center shrink-0">
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </button>
+          <div className="hidden md:flex items-center gap-2 shrink-0 justify-self-end">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-muted/60 transition-colors text-sm font-semibold text-foreground/80 hover:text-foreground focus:outline-none">
+                    <div className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[11px] font-bold uppercase shrink-0">
+                      {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                    </div>
+                    <span className="max-w-[120px] truncate">{user.name}</span>
+                    <ChevronDown className="w-3 h-3 opacity-50 shrink-0" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <div className="px-3 py-2 border-b border-border/50">
+                    <p className="font-semibold text-sm text-foreground truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{user.role === "superadmin" ? "Super Admin" : user.role}</p>
+                  </div>
+                  {isAdmin && (
+                    <Link href="/admin">
+                      <DropdownMenuItem className="gap-2 cursor-pointer mt-1">
+                        <ShieldCheck className="w-4 h-4" />
+                        User Management
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => logout().then(() => setLocation("/login"))}
+                    className="gap-2 text-destructive focus:text-destructive cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/login">
+                <Button size="sm" variant="outline" className="text-xs gap-1.5">
+                  Sign in
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Nav */}
@@ -585,22 +623,48 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                     </button>
                   </SheetClose>
                 </div>
-                <div className="p-4 mt-auto border-t border-border/50">
-                  <button
-                    type="button"
-                    disabled
-                    aria-disabled="true"
-                    title="Reporting is currently unavailable"
-                    className="flex w-full items-center justify-between bg-[hsl(260_40%_25%)] text-white pl-6 pr-2 py-2 rounded-md text-sm font-bold tracking-wider opacity-50 cursor-not-allowed"
-                  >
-                    <span className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" />
-                      REPORT AN ISSUE
-                    </span>
-                    <div className="w-8 h-8 rounded-sm bg-white/80 text-[hsl(260_40%_25%)] flex items-center justify-center shrink-0">
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </button>
+                <div className="p-4 mt-auto border-t border-border/50 space-y-2">
+                  {user ? (
+                    <>
+                      <div className="flex items-center gap-3 px-2 py-2 rounded-md bg-muted/40">
+                        <div className="w-8 h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                          {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
+                          <p className="text-xs text-muted-foreground capitalize">{user.role === "superadmin" ? "Super Admin" : user.role}</p>
+                        </div>
+                      </div>
+                      {isAdmin && (
+                        <SheetClose asChild>
+                          <Link href="/admin">
+                            <button className="flex w-full items-center gap-2 px-3 py-2.5 rounded-md hover:bg-primary/5 text-sm font-semibold text-foreground transition-colors">
+                              <ShieldCheck className="w-4 h-4 text-primary" />
+                              User Management
+                            </button>
+                          </Link>
+                        </SheetClose>
+                      )}
+                      <SheetClose asChild>
+                        <button
+                          onClick={() => logout().then(() => setLocation("/login"))}
+                          className="flex w-full items-center gap-2 px-3 py-2.5 rounded-md hover:bg-destructive/10 text-sm font-semibold text-destructive transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign out
+                        </button>
+                      </SheetClose>
+                    </>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link href="/login">
+                        <button className="flex w-full items-center justify-center gap-2 px-3 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90">
+                          Sign in
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </Link>
+                    </SheetClose>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
