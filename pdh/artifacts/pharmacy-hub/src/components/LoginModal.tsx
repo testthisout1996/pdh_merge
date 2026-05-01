@@ -73,106 +73,98 @@ export function LoginModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.22 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          transition={{ duration: 0.18 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/55"
           onClick={canClose ? closeLoginModal : undefined}
         >
-          {/* Background image */}
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: "url(/pharmacy-bg.jpg)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            aria-hidden="true"
-          />
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-[hsl(260,40%,15%)]/70 backdrop-blur-[2px]" aria-hidden="true" />
-
-          {/* Modal card — styled to match the navbar aesthetic */}
+          {/* Modal card — matches navbar aesthetic exactly */}
           <motion.div
             key="login-modal-card"
-            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            initial={{ opacity: 0, scale: 0.97, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, scale: 0.97, y: 6 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/40"
+            className="relative w-full max-w-sm overflow-hidden rounded-md border border-border/30 shadow-md bg-white"
           >
-            {/* Image strip at top of card */}
-            <div className="relative h-36 overflow-hidden">
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: "url(/pharmacy-bg.jpg)",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center 30%",
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[hsl(260,40%,15%)]/30 to-[hsl(260,40%,15%)]/70" />
-
-              {/* PDH Logo — same SVG cutout style as the navbar */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                <div className="relative w-[72px] h-[72px] overflow-hidden rounded-xl border border-white/20 shadow-lg">
-                  <svg className="w-full h-full" viewBox="0 0 72 72" aria-hidden="true">
-                    <defs>
-                      <mask id={maskId} maskUnits="userSpaceOnUse">
-                        <rect x="0" y="0" width="72" height="72" fill="white" />
-                        <text
-                          x="50%"
-                          y="50%"
-                          textAnchor="middle"
-                          dominantBaseline="central"
-                          fill="black"
-                          style={{ fontFamily: "var(--font-anton)", fontSize: "26px", letterSpacing: "-0.02em" }}
-                        >
-                          PDH
-                        </text>
-                      </mask>
-                    </defs>
-                    <rect x="0" y="0" width="72" height="72" fill="white" mask={`url(#${maskId})`} />
+            {/* Header bar — PDH logo left, title right, same look as navbar */}
+            <div className="relative overflow-hidden h-16 flex items-center px-5 gap-4 border-b border-border/20">
+              {/* SVG background — white fill with PDH punched through (same technique as navbar) */}
+              <svg
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <mask id={maskId} maskUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
                     <text
-                      x="50%"
+                      x="20"
                       y="50%"
-                      textAnchor="middle"
                       dominantBaseline="central"
-                      fill="none"
-                      stroke="rgba(44,27,61,0.55)"
-                      strokeWidth="0.8"
-                      style={{ fontFamily: "var(--font-anton)", fontSize: "26px", letterSpacing: "-0.02em" }}
+                      fill="black"
+                      style={{
+                        fontFamily: "var(--font-anton)",
+                        fontSize: "48px",
+                        letterSpacing: "-0.02em",
+                      }}
                     >
                       PDH
                     </text>
-                  </svg>
-                </div>
+                  </mask>
+                </defs>
+                {/* White panel with PDH cutout */}
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="100%"
+                  fill="white"
+                  mask={`url(#${maskId})`}
+                />
+                {/* Thin outline on the PDH text so it stays legible */}
+                <text
+                  x="20"
+                  y="50%"
+                  dominantBaseline="central"
+                  fill="none"
+                  stroke="rgba(44,27,61,0.45)"
+                  strokeWidth="0.8"
+                  style={{
+                    fontFamily: "var(--font-anton)",
+                    fontSize: "48px",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  PDH
+                </text>
+              </svg>
+
+              {/* Invisible spacer that matches the PDH text width so content flows to its right */}
+              <div className="relative z-10 shrink-0 w-[72px]" aria-hidden="true" />
+
+              {/* Title + subtitle to the right of the logo */}
+              <div className="relative z-10 flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground leading-tight truncate">
+                  Pharmacy Dispensing Hub
+                </p>
+                <p className="text-[11px] text-muted-foreground">Staff access</p>
               </div>
 
-              {/* Close button — only when not from a protected route */}
+              {/* Close button — only when not triggered by a protected route */}
               {canClose && (
                 <button
                   type="button"
                   onClick={closeLoginModal}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 text-white hover:bg-black/50 flex items-center justify-center transition-colors"
+                  className="relative z-10 shrink-0 w-7 h-7 rounded-md bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
                   aria-label="Close"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
 
-            {/* Card body — white, matching navbar radius + border feel */}
-            <div className="bg-white px-8 py-7">
-              <div className="text-center mb-6">
-                <h2
-                  className="text-xl font-bold text-foreground tracking-tight"
-                  style={{ fontFamily: "var(--font-serif)" }}
-                >
-                  Pharmacy Dispensing Hub
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">Enter your PIN to continue</p>
-              </div>
-
+            {/* Body */}
+            <div className="px-6 py-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-[11px] font-bold tracking-widest uppercase text-muted-foreground mb-2">
@@ -193,7 +185,7 @@ export function LoginModal() {
                         if (error) setError("");
                       }}
                       placeholder="4–8 digit PIN"
-                      className={`w-full pl-10 pr-12 py-3 rounded-xl border text-center text-lg tracking-[0.3em] font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                      className={`w-full pl-10 pr-12 py-2.5 rounded-md border text-center text-base tracking-[0.3em] font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 ${
                         error
                           ? "border-destructive bg-destructive/5 focus:ring-destructive/20"
                           : "border-border bg-muted/30 focus:border-primary/50"
@@ -210,11 +202,11 @@ export function LoginModal() {
                     </button>
                   </div>
 
-                  {/* PIN dots */}
+                  {/* PIN entry dots */}
                   {pin.length > 0 && (
                     <div className="flex items-center justify-center gap-1.5 mt-3">
                       {Array.from({ length: pin.length }).map((_, i) => (
-                        <div key={i} className="w-2 h-2 rounded-full bg-primary" />
+                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary" />
                       ))}
                     </div>
                   )}
@@ -230,14 +222,14 @@ export function LoginModal() {
                 <Button
                   type="submit"
                   disabled={submitting || pin.length < 4}
-                  className="w-full h-11 rounded-xl font-semibold text-sm tracking-wide gap-2"
+                  className="w-full h-10 rounded-md font-semibold text-sm tracking-wide gap-2"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   {submitting ? "Checking…" : "Unlock"}
                 </Button>
               </form>
 
-              <p className="text-center text-xs text-muted-foreground mt-5">
+              <p className="text-center text-xs text-muted-foreground mt-4">
                 Don't have a PIN?{" "}
                 <span className="text-foreground/60">Contact your administrator.</span>
               </p>
