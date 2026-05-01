@@ -63,17 +63,7 @@ function PilSearchHero({
   pilToolsRef?: React.RefObject<HTMLParagraphElement | null>;
 }) {
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{
-        height: "531px",
-        /* mask-image clips the entire hero (image + all overlays) as one unit —
-           no colour-layer interaction, so the bottom edge is perfectly smooth */
-        maskImage: "linear-gradient(to bottom, black 87%, rgba(0,0,0,0.15) 100%)",
-        WebkitMaskImage:
-          "linear-gradient(to bottom, black 87%, rgba(0,0,0,0.15) 100%)",
-      }}
-    >
+    <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
       <img
         src={heroImage}
         alt="Pharmacy interior with staff and customers"
@@ -568,7 +558,7 @@ export default function PilSearch() {
       <Navbar />
 
       <div>
-        <div ref={heroWrapperRef} style={{ backgroundColor: "hsl(268 18% 98%)" }}>
+        <div ref={heroWrapperRef}>
           <PilSearchHero
             pilToolsRef={pilToolsRef}
             activeTab={activeTab}
