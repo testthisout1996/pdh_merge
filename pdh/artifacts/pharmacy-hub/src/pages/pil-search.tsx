@@ -31,7 +31,7 @@ import {
   buildSearchQuery,
   classifyPilResult,
 } from "@/lib/pilUtils";
-import heroImage from "@assets/asian-client-navigates-pharmacy-shelves-full-drugs-vitamins-re_1777572824357.jpg";
+import heroImage from "@assets/pil-hero.webp";
 
 const PAGE_SIZE = 10;
 
