@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
+import heroImage from "@assets/pil-hero.webp";
 import {
   Menu,
   ChevronDown,
@@ -618,13 +619,21 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             onClick={handleScrollTop}
             aria-label="Back to top"
-            style={{
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-            }}
-            className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-md flex items-center justify-center bg-white/15 border border-white/30 text-white hover:bg-white/25 transition-colors duration-200 shadow-md cursor-pointer"
+            className="group fixed bottom-6 right-6 z-50 w-11 h-11 rounded-md relative overflow-hidden flex items-center justify-center border border-white/30 shadow-md cursor-pointer"
           >
-            <ArrowUp className="w-5 h-5 text-white" />
+            {/* Hero image layer */}
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url(${heroImage})`,
+                backgroundSize: "cover",
+                backgroundPosition: "70% center",
+              }}
+            />
+            {/* Dark tint — same purple used in the hero overlay, lightens on hover */}
+            <div className="absolute inset-0 bg-[#2c1b3d]/55 group-hover:bg-[#2c1b3d]/35 transition-colors duration-200" />
+            {/* Arrow */}
+            <ArrowUp className="relative z-10 w-5 h-5 text-white" />
           </motion.button>
         )}
       </AnimatePresence>
