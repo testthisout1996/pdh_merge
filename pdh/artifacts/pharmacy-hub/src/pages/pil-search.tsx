@@ -568,7 +568,7 @@ export default function PilSearch() {
       <Navbar />
 
       <div>
-        <div ref={heroWrapperRef}>
+        <div ref={heroWrapperRef} style={{ backgroundColor: "hsl(268 18% 98%)" }}>
           <PilSearchHero
             pilToolsRef={pilToolsRef}
             activeTab={activeTab}
