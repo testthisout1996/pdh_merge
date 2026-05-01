@@ -63,7 +63,17 @@ function PilSearchHero({
   pilToolsRef?: React.RefObject<HTMLParagraphElement | null>;
 }) {
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
+    <div
+      className="relative w-full overflow-hidden"
+      style={{
+        height: "531px",
+        /* mask-image clips the entire hero (image + all overlays) as one unit —
+           no colour-layer interaction, so the bottom edge is perfectly smooth */
+        maskImage: "linear-gradient(to bottom, black 78%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to bottom, black 78%, transparent 100%)",
+      }}
+    >
       <img
         src={heroImage}
         alt="Pharmacy interior with staff and customers"
@@ -72,21 +82,6 @@ function PilSearchHero({
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
-      {/* Edge blend — tight fade at the very bottom so the hero melts into the page */}
-      <div
-        className="absolute bottom-0 left-0 right-0 pointer-events-none"
-        style={{
-          height: "72px",
-          background: `linear-gradient(to bottom in oklab,
-            hsl(268 18% 98% / 0)    0%,
-            hsl(268 18% 98% / 0.04) 25%,
-            hsl(268 18% 98% / 0.18) 50%,
-            hsl(268 18% 98% / 0.52) 72%,
-            hsl(268 18% 98% / 0.82) 88%,
-            hsl(268 18% 98% / 0.96) 100%
-          )`,
-        }}
-      />
 
       <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
         <motion.div
