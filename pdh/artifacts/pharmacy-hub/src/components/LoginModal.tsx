@@ -105,67 +105,14 @@ export function LoginModal() {
                 aria-hidden="true"
               />
 
-              {/* PDH logo — same SVG cutout technique as navbar, but on the dark image background
-                  so the cutout reveals the image through the letters */}
-              <div className="relative z-10 shrink-0 h-12 w-[72px] overflow-hidden rounded-md">
-                <svg
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <mask id={maskId} maskUnits="userSpaceOnUse">
-                      <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                      <text
-                        x="50%"
-                        y="50%"
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        fill="black"
-                        style={{
-                          fontFamily: "var(--font-anton)",
-                          fontSize: "26px",
-                          letterSpacing: "-0.02em",
-                        }}
-                      >
-                        PDH
-                      </text>
-                    </mask>
-                  </defs>
-                  {/* White fill with PDH punched out — reveals image behind */}
-                  <rect
-                    x="0"
-                    y="0"
-                    width="100%"
-                    height="100%"
-                    fill="white"
-                    mask={`url(#${maskId})`}
-                  />
-                  {/* Thin outline keeps letters legible */}
-                  <text
-                    x="50%"
-                    y="50%"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fill="none"
-                    stroke="rgba(44,27,61,0.4)"
-                    strokeWidth="0.6"
-                    style={{
-                      fontFamily: "var(--font-anton)",
-                      fontSize: "26px",
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
-                    PDH
-                  </text>
-                </svg>
-              </div>
-
-              {/* Title + subtitle to the right of the logo */}
+              {/* Title */}
               <div className="relative z-10 flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white leading-tight truncate">
+                <p className="text-[11px] font-bold tracking-widest uppercase text-white/60 mb-0.5">
                   Pharmacy Dispensing Hub
                 </p>
-                <p className="text-[11px] text-white/70">Staff access</p>
+                <p className="text-xl font-bold text-white leading-tight">
+                  Login
+                </p>
               </div>
 
               {/* Close button — only when not triggered by a protected route */}
@@ -247,10 +194,17 @@ export function LoginModal() {
                 </Button>
               </form>
 
-              <p className="text-center text-xs text-muted-foreground mt-4">
-                Don't have a PIN?{" "}
-                <span className="text-foreground/60">Contact your administrator.</span>
-              </p>
+              <div className="mt-4 space-y-3">
+                <p className="text-center text-xs text-muted-foreground">
+                  Don't have a PIN?{" "}
+                  <span className="text-foreground/60">Contact your administrator.</span>
+                </p>
+                <div className="border-t border-border/40" />
+                <p className="text-center text-xs text-muted-foreground">
+                  Forgotten PIN?{" "}
+                  <span className="text-foreground/60">Contact a Senior Member to reset.</span>
+                </p>
+              </div>
             </div>
           </motion.div>
         </motion.div>
