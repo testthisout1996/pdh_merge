@@ -27,13 +27,7 @@ function Router() {
           </ProtectedRoute>
         )}
       </Route>
-      <Route path="/">
-        {() => (
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        )}
-      </Route>
+      <Route path="/" component={Home} />
       <Route path="/tools/pils/pil-search">
         {() => (
           <ProtectedRoute>
