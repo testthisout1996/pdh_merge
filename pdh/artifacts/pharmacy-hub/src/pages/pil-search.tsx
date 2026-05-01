@@ -63,7 +63,7 @@ function PilSearchHero({
   pilToolsRef?: React.RefObject<HTMLParagraphElement | null>;
 }) {
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "425px" }}>
+    <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
       <img
         src={heroImage}
         alt="Pharmacy interior with staff and customers"
@@ -72,6 +72,8 @@ function PilSearchHero({
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
+      {/* Fade-out to page background at the bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-b from-transparent to-background pointer-events-none" />
 
       <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
         <motion.div
@@ -489,7 +491,7 @@ const NAVBAR_BAR_H = 64;  // h-16 navbar bar height
 const NAVBAR_BOTTOM = NAVBAR_TOP_GAP + NAVBAR_BAR_H; // = 80px from viewport top
 const GAP = NAVBAR_TOP_GAP; // lock gap matches the navbar's own top spacing (16px)
 const LOCK_TARGET_Y = NAVBAR_BOTTOM + GAP; // PIL TOOLS locks at this viewport Y = 96px
-const HERO_H = 425;    // hero section height
+const HERO_H = 531;    // hero section height (425 × 1.25)
 
 export default function PilSearch() {
   const [activeTab, setActiveTab] = React.useState("search");
@@ -569,7 +571,7 @@ export default function PilSearch() {
         {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock */}
         <div ref={spacerRef} style={{ height: 0 }} />
 
-        <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
+        <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 pt-10 pb-8">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
