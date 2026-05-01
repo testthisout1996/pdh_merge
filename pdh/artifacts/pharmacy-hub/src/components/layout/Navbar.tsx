@@ -129,16 +129,18 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
     if (container) {
       const handleScroll = () => {
         const st = container.scrollTop;
+        const nearBottom = st + container.clientHeight >= container.scrollHeight - 150;
         setScrolled(st > 20);
-        setShowScrollTop(st > window.innerHeight * 2);
+        setShowScrollTop(st > window.innerHeight * 2 || nearBottom);
       };
       container.addEventListener("scroll", handleScroll, { passive: true });
       return () => container.removeEventListener("scroll", handleScroll);
     } else {
       const handleScroll = () => {
         const sy = window.scrollY;
+        const nearBottom = sy + window.innerHeight >= document.body.scrollHeight - 150;
         setScrolled(sy > 20);
-        setShowScrollTop(sy > window.innerHeight * 2);
+        setShowScrollTop(sy > window.innerHeight * 2 || nearBottom);
       };
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
