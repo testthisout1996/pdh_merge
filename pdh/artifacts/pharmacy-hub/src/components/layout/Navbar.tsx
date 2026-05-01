@@ -130,7 +130,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
       const handleScroll = () => {
         const st = container.scrollTop;
         setScrolled(st > 20);
-        setShowScrollTop(st > 200);
+        setShowScrollTop(st > window.innerHeight * 2);
       };
       container.addEventListener("scroll", handleScroll, { passive: true });
       return () => container.removeEventListener("scroll", handleScroll);
@@ -138,7 +138,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
       const handleScroll = () => {
         const sy = window.scrollY;
         setScrolled(sy > 20);
-        setShowScrollTop(sy > 200);
+        setShowScrollTop(sy > window.innerHeight * 2);
       };
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
