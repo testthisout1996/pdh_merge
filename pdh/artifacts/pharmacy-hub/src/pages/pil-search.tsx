@@ -56,12 +56,12 @@ function formatDate(dateStr?: string) {
 function PilSearchHero({
   activeTab,
   onTabChange,
-  pilToolsRef,
+  buttonsRef,
   heroImgRef,
 }: {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  pilToolsRef?: React.RefObject<HTMLParagraphElement | null>;
+  buttonsRef?: React.RefObject<HTMLDivElement | null>;
   heroImgRef?: React.RefObject<HTMLImageElement | null>;
 }) {
   return (
@@ -87,10 +87,7 @@ function PilSearchHero({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         >
-          <p
-            ref={pilToolsRef}
-            className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2"
-          >
+          <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">
             PIL Tools
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
@@ -102,7 +99,7 @@ function PilSearchHero({
             names, active substances, or PL numbers.
           </p>
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div ref={buttonsRef} className="flex items-center gap-3 flex-wrap">
             <button
               onClick={() => onTabChange("search")}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -505,7 +502,7 @@ export default function PilSearch() {
   const pageRef = React.useRef<HTMLDivElement>(null);
   const heroWrapperRef = React.useRef<HTMLDivElement>(null);
   const spacerRef = React.useRef<HTMLDivElement>(null);
-  const pilToolsRef = React.useRef<HTMLParagraphElement>(null);
+  const buttonsRef = React.useRef<HTMLDivElement>(null);
   const heroImgRef = React.useRef<HTMLImageElement>(null);
   const lockAtRef = React.useRef<number>(0);
   const heroFixedTopRef = React.useRef<number>(0);
@@ -521,15 +518,15 @@ export default function PilSearch() {
 
     const onScroll = () => {
       const scrollTop = page.scrollTop;
-      const pilEl = pilToolsRef.current;
+      const btnEl = buttonsRef.current;
       const imgEl = heroImgRef.current;
 
       // While unlocked: recalculate lock threshold every frame so it reflects
       // the element's true settled position after the mount animation finishes.
-      if (!isLockedRef.current && pilEl) {
-        const rect = pilEl.getBoundingClientRect();
-        const pilToolsDomY = rect.top + scrollTop;
-        lockAtRef.current = pilToolsDomY - LOCK_TARGET_Y;
+      if (!isLockedRef.current && btnEl) {
+        const rect = btnEl.getBoundingClientRect();
+        const btnsDomY = rect.top + scrollTop;
+        lockAtRef.current = btnsDomY - LOCK_TARGET_Y;
         heroFixedTopRef.current = -lockAtRef.current;
       }
 
@@ -579,7 +576,7 @@ export default function PilSearch() {
       <div>
         <div ref={heroWrapperRef}>
           <PilSearchHero
-            pilToolsRef={pilToolsRef}
+            buttonsRef={buttonsRef}
             heroImgRef={heroImgRef}
             activeTab={activeTab}
             onTabChange={setActiveTab}
