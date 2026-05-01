@@ -558,7 +558,7 @@ export default function PilSearch() {
       <Navbar />
 
       <div>
-        <div ref={heroWrapperRef}>
+        <div ref={heroWrapperRef} style={{ boxShadow: "0 6px 28px rgba(0,0,0,0.16)" }}>
           <PilSearchHero
             pilToolsRef={pilToolsRef}
             activeTab={activeTab}
@@ -569,7 +569,7 @@ export default function PilSearch() {
         {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock.
             paddingBottom provides a permanent gap between hero bottom and content, regardless
             of locked state, without causing a jump at lock time. */}
-        <div ref={spacerRef} style={{ height: 0, paddingBottom: "16px" }} />
+        <div ref={spacerRef} style={{ height: 0, paddingBottom: "24px" }} />
 
         <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
           <motion.div
