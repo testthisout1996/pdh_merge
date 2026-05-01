@@ -492,9 +492,10 @@ function SearchTab() {
 const NAVBAR_TOP_GAP = 16; // pt-4 spacing above the navbar box when not scrolled
 const NAVBAR_BAR_H = 64;  // h-16 navbar bar height
 const NAVBAR_BOTTOM = NAVBAR_TOP_GAP + NAVBAR_BAR_H; // = 80px from viewport top
-const GAP = NAVBAR_TOP_GAP; // lock gap matches the navbar's own top spacing (16px)
-const LOCK_TARGET_Y = NAVBAR_BOTTOM + GAP; // PIL TOOLS locks at this viewport Y = 96px
+const GAP = 4; // tight gap so buttons sit just below the navbar bar
+const LOCK_TARGET_Y = NAVBAR_BOTTOM + GAP; // buttons lock at this viewport Y = 84px
 const HERO_H = 531;    // hero section height (425 × 1.25)
+const BLUR_MAX = 10;   // max blur radius (px) applied to the overlay
 
 export default function PilSearch() {
   const [activeTab, setActiveTab] = React.useState("search");
@@ -504,11 +505,21 @@ export default function PilSearch() {
   const spacerRef = React.useRef<HTMLDivElement>(null);
   const buttonsRef = React.useRef<HTMLDivElement>(null);
   const heroImgRef = React.useRef<HTMLImageElement>(null);
+  const blurLayerRef = React.useRef<HTMLDivElement>(null);
   const lockAtRef = React.useRef<number>(0);
   const heroFixedTopRef = React.useRef<number>(0);
   const isLockedRef = React.useRef<boolean>(false);
 
   const PARALLAX = 0.2;
+
+  const handleTabClick = React.useCallback((tab: string) => {
+    setActiveTab(tab);
+    const page = pageRef.current;
+    const lockAt = lockAtRef.current;
+    if (page && lockAt > 0 && page.scrollTop > lockAt) {
+      page.scrollTo({ top: lockAt, behavior: "smooth" });
+    }
+  }, []);
 
   React.useEffect(() => {
     const page = pageRef.current;
@@ -537,6 +548,16 @@ export default function PilSearch() {
       if (imgEl) {
         const shift = Math.min(scrollTop, lockAtRef.current > 0 ? lockAtRef.current : scrollTop);
         imgEl.style.transform = `translateY(${shift * PARALLAX}px)`;
+      }
+
+      // Blur overlay: ramp from 0 → BLUR_MAX as scroll approaches lockAt.
+      const blurEl = blurLayerRef.current;
+      if (blurEl) {
+        const progress = lockAtRef.current > 0 ? Math.min(1, scrollTop / lockAtRef.current) : 0;
+        const blurPx = (progress * BLUR_MAX).toFixed(2);
+        blurEl.style.backdropFilter = `blur(${blurPx}px)`;
+        (blurEl.style as CSSStyleDeclaration & { webkitBackdropFilter: string }).webkitBackdropFilter = `blur(${blurPx}px)`;
+        blurEl.style.opacity = String(progress);
       }
 
       // Only act on a change — and write directly to the DOM so both the hero
@@ -573,13 +594,33 @@ export default function PilSearch() {
     >
       <Navbar scrollContainerRef={pageRef as React.RefObject<HTMLElement>} />
 
+      {/* Blur overlay — sits above the hero (z-30) but below the navbar (z-50).
+          Ramps from transparent/unblurred at scroll=0 to fully blurred at lockAt. */}
+      <div
+        ref={blurLayerRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: `${NAVBAR_BOTTOM + 24}px`,
+          zIndex: 40,
+          pointerEvents: "none",
+          opacity: 0,
+          backdropFilter: "blur(0px)",
+          WebkitBackdropFilter: "blur(0px)",
+          maskImage: `linear-gradient(to bottom, black 0%, black 55%, transparent 100%)`,
+          WebkitMaskImage: `linear-gradient(to bottom, black 0%, black 55%, transparent 100%)`,
+        } as React.CSSProperties}
+      />
+
       <div>
         <div ref={heroWrapperRef}>
           <PilSearchHero
             buttonsRef={buttonsRef}
             heroImgRef={heroImgRef}
             activeTab={activeTab}
-            onTabChange={setActiveTab}
+            onTabChange={handleTabClick}
           />
         </div>
 
