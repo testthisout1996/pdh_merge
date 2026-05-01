@@ -14,6 +14,7 @@ import {
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import heroImage from "@assets/pil-hero.webp";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -619,10 +620,11 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
             onClick={handleScrollTop}
             aria-label="Back to top"
             style={{
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
+              backgroundImage: `linear-gradient(rgba(44,27,61,0.72), rgba(44,27,61,0.72)), url(${heroImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
-            className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-md flex items-center justify-center bg-white/15 border border-white/30 text-white hover:bg-white/25 transition-colors duration-200 shadow-md cursor-pointer"
+            className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-md flex items-center justify-center border border-white/30 text-white hover:brightness-110 transition-[filter] duration-200 shadow-md cursor-pointer"
           >
             <ArrowUp className="w-5 h-5 text-white" />
           </motion.button>
