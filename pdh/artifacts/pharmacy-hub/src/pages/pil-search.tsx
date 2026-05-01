@@ -69,9 +69,9 @@ function PilSearchHero({
         height: "531px",
         /* mask-image clips the entire hero (image + all overlays) as one unit —
            no colour-layer interaction, so the bottom edge is perfectly smooth */
-        maskImage: "linear-gradient(to bottom, black 78%, transparent 100%)",
+        maskImage: "linear-gradient(to bottom, black 92%, transparent 100%)",
         WebkitMaskImage:
-          "linear-gradient(to bottom, black 78%, transparent 100%)",
+          "linear-gradient(to bottom, black 92%, transparent 100%)",
       }}
     >
       <img
