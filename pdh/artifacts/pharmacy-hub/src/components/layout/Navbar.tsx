@@ -46,6 +46,11 @@ interface NavbarProps {
    * section.
    */
   onNavigate?: (section: ActiveSection) => void;
+  /**
+   * Optional scroll container to listen to instead of window. Use this when
+   * the page uses a custom overflow-y-auto container (e.g. PIL Search).
+   */
+  scrollContainerRef?: React.RefObject<HTMLElement | null>;
 }
 
 function getActiveFromLocation(loc: string): ActiveSection {
@@ -108,7 +113,7 @@ function NavLink({
   );
 }
 
-export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
+export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: NavbarProps) {
   const [scrolled, setScrolled] = React.useState(false);
   const [location, setLocation] = useLocation();
   const [toolsOpen, setToolsOpen] = React.useState(false);
@@ -117,10 +122,17 @@ export function Navbar({ active: activeProp, onNavigate }: NavbarProps) {
   const navbarMaskId = `navbar-pdh-mask-${reactId.replace(/[:]/g, "")}`;
 
   React.useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    const container = scrollContainerRef?.current ?? null;
+    if (container) {
+      const handleScroll = () => setScrolled(container.scrollTop > 20);
+      container.addEventListener("scroll", handleScroll, { passive: true });
+      return () => container.removeEventListener("scroll", handleScroll);
+    } else {
+      const handleScroll = () => setScrolled(window.scrollY > 20);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [scrollContainerRef]);
 
   const cancelToolsClose = React.useCallback(() => {
     if (closeTimerRef.current !== null) {

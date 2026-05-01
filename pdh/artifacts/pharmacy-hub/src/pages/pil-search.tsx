@@ -574,7 +574,7 @@ export default function PilSearch() {
       ref={pageRef}
       className="h-[100dvh] overflow-y-auto bg-background selection:bg-primary/20"
     >
-      <Navbar />
+      <Navbar scrollContainerRef={pageRef as React.RefObject<HTMLElement>} />
 
       <div>
         <div ref={heroWrapperRef}>
