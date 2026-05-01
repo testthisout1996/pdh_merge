@@ -9,6 +9,7 @@ import {
   FileText,
   AlertTriangle,
   ArrowRight,
+  ArrowUp,
   Pill,
   Search,
 } from "lucide-react";
@@ -115,6 +116,7 @@ function NavLink({
 
 export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: NavbarProps) {
   const [scrolled, setScrolled] = React.useState(false);
+  const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [location, setLocation] = useLocation();
   const [toolsOpen, setToolsOpen] = React.useState(false);
   const closeTimerRef = React.useRef<number | null>(null);
@@ -124,13 +126,30 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
   React.useEffect(() => {
     const container = scrollContainerRef?.current ?? null;
     if (container) {
-      const handleScroll = () => setScrolled(container.scrollTop > 20);
+      const handleScroll = () => {
+        const st = container.scrollTop;
+        setScrolled(st > 20);
+        setShowScrollTop(st > 200);
+      };
       container.addEventListener("scroll", handleScroll, { passive: true });
       return () => container.removeEventListener("scroll", handleScroll);
     } else {
-      const handleScroll = () => setScrolled(window.scrollY > 20);
+      const handleScroll = () => {
+        const sy = window.scrollY;
+        setScrolled(sy > 20);
+        setShowScrollTop(sy > 200);
+      };
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [scrollContainerRef]);
+
+  const handleScrollTop = React.useCallback(() => {
+    const container = scrollContainerRef?.current ?? null;
+    if (container) {
+      container.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [scrollContainerRef]);
 
@@ -587,6 +606,28 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
         </header>
       </div>
     </motion.div>
+
+      {/* ── Back to Top ── */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            key="back-to-top"
+            initial={{ opacity: 0, scale: 0.85, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.85, y: 8 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            onClick={handleScrollTop}
+            aria-label="Back to top"
+            style={{
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+            className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-md flex items-center justify-center bg-white/15 border border-white/30 text-white hover:bg-white/25 transition-colors duration-200 shadow-md cursor-pointer"
+          >
+            <ArrowUp className="w-5 h-5 text-white" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </>
   );
 }
