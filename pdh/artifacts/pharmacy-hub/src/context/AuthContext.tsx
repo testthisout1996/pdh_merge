@@ -14,6 +14,10 @@ interface AuthContextValue {
   login: (pin: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  loginModalOpen: boolean;
+  openLoginModal: (postLoginPath?: string) => void;
+  closeLoginModal: () => void;
+  postLoginPath: string | null;
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
@@ -21,6 +25,8 @@ const AuthContext = React.createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<AuthUser | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [loginModalOpen, setLoginModalOpen] = React.useState(false);
+  const [postLoginPath, setPostLoginPath] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(async () => {
     try {
@@ -42,6 +48,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refresh();
   }, [refresh]);
 
+  const openLoginModal = React.useCallback((path?: string) => {
+    setPostLoginPath(path ?? null);
+    setLoginModalOpen(true);
+  }, []);
+
+  const closeLoginModal = React.useCallback(() => {
+    setLoginModalOpen(false);
+    setPostLoginPath(null);
+  }, []);
+
   const login = React.useCallback(async (pin: string): Promise<{ error?: string }> => {
     try {
       const res = await fetch("/api/auth/login", {
@@ -55,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: data.error ?? "Login failed" };
       }
       setUser(data);
+      setLoginModalOpen(false);
       return {};
     } catch {
       return { error: "Network error. Please try again." };
@@ -67,7 +84,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refresh }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        refresh,
+        loginModalOpen,
+        openLoginModal,
+        closeLoginModal,
+        postLoginPath,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

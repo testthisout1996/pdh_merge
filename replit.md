@@ -30,6 +30,18 @@ The Vite dev server proxies `/api` → `http://localhost:8080`, so the frontend 
 - Build API: `cd pdh && pnpm --filter @workspace/api-server run build`
 - Typecheck all: `cd pdh && pnpm run typecheck`
 
+## Authentication
+
+PIN-based auth using `express-session` on the API server.
+
+- **Login**: Modal overlay (`LoginModal.tsx`) — no dedicated /login page. Triggered by navbar "Sign in" button or when accessing a protected route. Uses `/pharmacy-bg.jpg` as a background image.
+- **Routes**: `/api/auth/login` (POST), `/api/auth/logout` (POST), `/api/auth/me` (GET). Users stored in `pdh/artifacts/api-server/data/users.json`.
+- **Roles**: `superadmin` (PIN 1111 default), `admin` (PIN 9999 default), `basic`.
+- **ProtectedRoute**: Opens the modal (stays on current page) instead of redirecting to /login.
+- **Profile & Settings** (`/profile`): Unified settings page for all logged-in users. Basic users: change own PIN. Admin+: add/delete staff, reset PINs. Superadmin: + change superadmin PIN, toggle PIN visibility.
+- **Logout** always navigates to `/` (homepage).
+- `/login` and `/admin` routes redirect to `/` and `/profile` respectively.
+
 ## UI conventions
 
 - **Corner radius**: all "boxes" (cards, panels, status banners, menu items, dropdowns, dialogs, etc.) use `rounded-md` so they match the navbar's corner radius. The base `Card` primitive is already `rounded-md`, so any new `<Card>` inherits this automatically. When writing new components, use `rounded-md` on container divs — avoid `rounded-xl`, `rounded-2xl`, `rounded-3xl`. Pills/circles (`rounded-full`) and small status dots are exceptions.

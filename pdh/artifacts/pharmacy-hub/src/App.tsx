@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,27 +7,41 @@ import Home from "@/pages/home";
 import ToolPlaceholder from "@/pages/tool-placeholder";
 import PilSearch from "@/pages/pil-search";
 import PilPrinterComingSoon from "@/pages/pil-printer-coming-soon";
-import Login from "@/pages/Login";
-import Admin from "@/pages/Admin";
+import Profile from "@/pages/Profile";
 import { PilUpdateProvider } from "@/context/PilUpdateContext";
 import { PilUpdateFloatingPanel } from "@/components/pil/PilUpdateFloatingPanel";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { LoginModal } from "@/components/LoginModal";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
-      <Route path="/login" component={Login} />
+      {/* Public */}
+      <Route path="/" component={Home} />
+
+      {/* /login redirects to home — modal handles login now */}
+      <Route path="/login">
+        {() => <Redirect to="/" />}
+      </Route>
+
+      {/* /admin redirects to /profile */}
       <Route path="/admin">
+        {() => <Redirect to="/profile" />}
+      </Route>
+
+      {/* Profile & Settings — all authenticated users */}
+      <Route path="/profile">
         {() => (
-          <ProtectedRoute requiredRole={["admin", "superadmin"]}>
-            <Admin />
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         )}
       </Route>
-      <Route path="/" component={Home} />
+
+      {/* Protected tools */}
       <Route path="/tools/pils/pil-search">
         {() => (
           <ProtectedRoute>
@@ -56,6 +70,7 @@ function Router() {
           </ProtectedRoute>
         )}
       </Route>
+
       <Route component={NotFound} />
     </Switch>
   );
@@ -71,6 +86,7 @@ function App() {
               <Router />
             </WouterRouter>
             <PilUpdateFloatingPanel />
+            <LoginModal />
           </PilUpdateProvider>
           <Toaster />
         </AuthProvider>

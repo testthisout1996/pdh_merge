@@ -13,9 +13,8 @@ import {
   Search,
   LogOut,
   ShieldCheck,
-  Crown,
   User,
-  ShieldAlert,
+  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@assets/pil-hero.webp";
@@ -129,7 +128,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
   const closeTimerRef = React.useRef<number | null>(null);
   const reactId = React.useId();
   const navbarMaskId = `navbar-pdh-mask-${reactId.replace(/[:]/g, "")}`;
-  const { user, logout } = useAuth();
+  const { user, logout, openLoginModal } = useAuth();
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
   const isSuperAdmin = user?.role === "superadmin";
 
@@ -460,17 +459,15 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                     <p className="font-semibold text-sm text-foreground truncate">{user.name}</p>
                     <p className="text-xs text-muted-foreground capitalize">{user.role === "superadmin" ? "Super Admin" : user.role}</p>
                   </div>
-                  {isAdmin && (
-                    <Link href="/admin">
-                      <DropdownMenuItem className="gap-2 cursor-pointer mt-1">
-                        <ShieldCheck className="w-4 h-4" />
-                        User Management
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
+                  <Link href="/profile">
+                    <DropdownMenuItem className="gap-2 cursor-pointer mt-1">
+                      <User className="w-4 h-4" />
+                      Profile &amp; Settings
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => logout().then(() => setLocation("/login"))}
+                    onClick={() => logout().then(() => setLocation("/"))}
                     className="gap-2 text-destructive focus:text-destructive cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
@@ -479,11 +476,14 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/login">
-                <Button size="sm" variant="outline" className="text-xs gap-1.5">
-                  Sign in
-                </Button>
-              </Link>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs gap-1.5"
+                onClick={() => openLoginModal()}
+              >
+                Sign in
+              </Button>
             )}
           </div>
 
@@ -635,19 +635,17 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                           <p className="text-xs text-muted-foreground capitalize">{user.role === "superadmin" ? "Super Admin" : user.role}</p>
                         </div>
                       </div>
-                      {isAdmin && (
-                        <SheetClose asChild>
-                          <Link href="/admin">
-                            <button className="flex w-full items-center gap-2 px-3 py-2.5 rounded-md hover:bg-primary/5 text-sm font-semibold text-foreground transition-colors">
-                              <ShieldCheck className="w-4 h-4 text-primary" />
-                              User Management
-                            </button>
-                          </Link>
-                        </SheetClose>
-                      )}
+                      <SheetClose asChild>
+                        <Link href="/profile">
+                          <button className="flex w-full items-center gap-2 px-3 py-2.5 rounded-md hover:bg-primary/5 text-sm font-semibold text-foreground transition-colors">
+                            <User className="w-4 h-4 text-primary" />
+                            Profile &amp; Settings
+                          </button>
+                        </Link>
+                      </SheetClose>
                       <SheetClose asChild>
                         <button
-                          onClick={() => logout().then(() => setLocation("/login"))}
+                          onClick={() => logout().then(() => setLocation("/"))}
                           className="flex w-full items-center gap-2 px-3 py-2.5 rounded-md hover:bg-destructive/10 text-sm font-semibold text-destructive transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
@@ -657,12 +655,13 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                     </>
                   ) : (
                     <SheetClose asChild>
-                      <Link href="/login">
-                        <button className="flex w-full items-center justify-center gap-2 px-3 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90">
-                          Sign in
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
-                      </Link>
+                      <button
+                        onClick={() => openLoginModal()}
+                        className="flex w-full items-center justify-center gap-2 px-3 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90"
+                      >
+                        Sign in
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
                     </SheetClose>
                   )}
                 </div>

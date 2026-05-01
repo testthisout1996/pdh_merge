@@ -1,0 +1,529 @@
+import * as React from "react";
+import { useLocation } from "wouter";
+import {
+  Users,
+  Plus,
+  Trash2,
+  KeyRound,
+  ShieldCheck,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  UserCog,
+  Crown,
+  User,
+} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type Role = "superadmin" | "admin" | "basic";
+
+interface UserRow {
+  id: string;
+  name: string;
+  role: Role;
+}
+
+function roleBadge(role: Role) {
+  if (role === "superadmin")
+    return (
+      <Badge className="bg-[hsl(260,40%,25%)]/10 text-[hsl(260,40%,25%)] border-[hsl(260,40%,25%)]/20 gap-1 text-xs">
+        <Crown className="w-3 h-3" /> Super Admin
+      </Badge>
+    );
+  if (role === "admin")
+    return (
+      <Badge className="bg-primary/10 text-primary border-primary/20 gap-1 text-xs">
+        <ShieldCheck className="w-3 h-3" /> Admin
+      </Badge>
+    );
+  return (
+    <Badge variant="outline" className="text-muted-foreground gap-1 text-xs">
+      <UserCog className="w-3 h-3" /> Basic
+    </Badge>
+  );
+}
+
+function PinInput({
+  value,
+  onChange,
+  placeholder,
+  autoFocus,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  autoFocus?: boolean;
+}) {
+  const [show, setShow] = React.useState(false);
+  return (
+    <div className="relative">
+      <input
+        type={show ? "text" : "password"}
+        inputMode="numeric"
+        autoFocus={autoFocus}
+        value={value}
+        onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 8))}
+        placeholder={placeholder ?? "4–8 digit PIN"}
+        className="w-full pr-10 py-2 px-3 rounded-lg border border-border bg-muted/20 text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+      />
+      <button
+        type="button"
+        onClick={() => setShow((v) => !v)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        tabIndex={-1}
+      >
+        {show ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+      </button>
+    </div>
+  );
+}
+
+function Section({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+      <h2 className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground flex items-center gap-2 mb-5">
+        {icon} {title}
+      </h2>
+      {children}
+    </div>
+  );
+}
+
+export default function Profile() {
+  const { user, logout, refresh } = useAuth();
+  const [, setLocation] = useLocation();
+  const isSuperAdmin = user?.role === "superadmin";
+  const isAdmin = user?.role === "admin" || isSuperAdmin;
+
+  const [users, setUsers] = React.useState<UserRow[]>([]);
+  const [loadingUsers, setLoadingUsers] = React.useState(false);
+  const [showPins, setShowPins] = React.useState(false);
+  const [rawPins, setRawPins] = React.useState<Record<string, string>>({});
+
+  const [newName, setNewName] = React.useState("");
+  const [newPin, setNewPin] = React.useState("");
+  const [addError, setAddError] = React.useState("");
+  const [addSuccess, setAddSuccess] = React.useState("");
+  const [adding, setAdding] = React.useState(false);
+
+  const [deleteTarget, setDeleteTarget] = React.useState<UserRow | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
+
+  const [resetTarget, setResetTarget] = React.useState<UserRow | null>(null);
+  const [resetPin, setResetPin] = React.useState("");
+  const [resetConfirm, setResetConfirm] = React.useState("");
+  const [resetError, setResetError] = React.useState("");
+  const [resetting, setResetting] = React.useState(false);
+
+  const [roleTarget, setRoleTarget] = React.useState<UserRow | null>(null);
+  const [roleValue, setRoleValue] = React.useState<"admin" | "basic">("basic");
+  const [roleError, setRoleError] = React.useState("");
+  const [savingRole, setSavingRole] = React.useState(false);
+
+  const [myPin, setMyPin] = React.useState("");
+  const [myPinConfirm, setMyPinConfirm] = React.useState("");
+  const [myPinError, setMyPinError] = React.useState("");
+  const [myPinSuccess, setMyPinSuccess] = React.useState("");
+  const [savingMyPin, setSavingMyPin] = React.useState(false);
+
+  const [superPin, setSuperPin] = React.useState("");
+  const [superPinConfirm, setSuperPinConfirm] = React.useState("");
+  const [superPinError, setSuperPinError] = React.useState("");
+  const [superPinSuccess, setSuperPinSuccess] = React.useState("");
+  const [savingSuperPin, setSavingSuperPin] = React.useState(false);
+
+  const fetchUsers = React.useCallback(async () => {
+    if (!isAdmin) return;
+    setLoadingUsers(true);
+    try {
+      const res = await fetch("/api/users", { credentials: "include" });
+      if (res.ok) {
+        const data: UserRow[] = await res.json();
+        setUsers(data);
+      }
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, [isAdmin]);
+
+  React.useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddError(""); setAddSuccess("");
+    if (!newName.trim() || !newPin) { setAddError("Name and PIN are required."); return; }
+    if (!/^\d{4,8}$/.test(newPin)) { setAddError("PIN must be 4–8 digits."); return; }
+    setAdding(true);
+    const res = await fetch("/api/users", {
+      method: "POST", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newName.trim(), pin: newPin }),
+    });
+    const data = await res.json();
+    setAdding(false);
+    if (!res.ok) { setAddError(data.error ?? "Failed to add user."); }
+    else { setAddSuccess(`User "${data.name}" added.`); setNewName(""); setNewPin(""); fetchUsers(); }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    await fetch(`/api/users/${deleteTarget.id}`, { method: "DELETE", credentials: "include" });
+    setDeleting(false);
+    setDeleteTarget(null);
+    fetchUsers();
+  };
+
+  const handleResetPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError("");
+    if (!resetPin || !resetConfirm) { setResetError("Both fields are required."); return; }
+    if (resetPin !== resetConfirm) { setResetError("PINs do not match."); return; }
+    if (!/^\d{4,8}$/.test(resetPin)) { setResetError("PIN must be 4–8 digits."); return; }
+    setResetting(true);
+    const res = await fetch(`/api/users/${resetTarget!.id}/pin`, {
+      method: "PATCH", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin: resetPin, confirmPin: resetConfirm }),
+    });
+    const data = await res.json();
+    setResetting(false);
+    if (!res.ok) { setResetError(data.error ?? "Failed."); }
+    else { setResetTarget(null); setResetPin(""); setResetConfirm(""); }
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleTarget) return;
+    setRoleError(""); setSavingRole(true);
+    const res = await fetch(`/api/users/${roleTarget.id}/role`, {
+      method: "PATCH", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: roleValue }),
+    });
+    const data = await res.json();
+    setSavingRole(false);
+    if (!res.ok) { setRoleError(data.error ?? "Failed."); }
+    else { setRoleTarget(null); fetchUsers(); }
+  };
+
+  const handleMyPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMyPinError(""); setMyPinSuccess("");
+    if (!myPin || !myPinConfirm) { setMyPinError("Both fields are required."); return; }
+    if (myPin !== myPinConfirm) { setMyPinError("PINs do not match."); return; }
+    if (!/^\d{4,8}$/.test(myPin)) { setMyPinError("PIN must be 4–8 digits."); return; }
+    setSavingMyPin(true);
+    const res = await fetch(`/api/users/${user!.id}/pin`, {
+      method: "PATCH", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin: myPin, confirmPin: myPinConfirm }),
+    });
+    const data = await res.json();
+    setSavingMyPin(false);
+    if (!res.ok) { setMyPinError(data.error ?? "Failed."); }
+    else { setMyPinSuccess("Your PIN has been updated."); setMyPin(""); setMyPinConfirm(""); refresh(); }
+  };
+
+  const handleSuperPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuperPinError(""); setSuperPinSuccess("");
+    if (!superPin || !superPinConfirm) { setSuperPinError("Both fields are required."); return; }
+    if (superPin !== superPinConfirm) { setSuperPinError("PINs do not match."); return; }
+    if (!/^\d{4,8}$/.test(superPin)) { setSuperPinError("PIN must be 4–8 digits."); return; }
+    setSavingSuperPin(true);
+    const res = await fetch(`/api/users/${user!.id}/pin`, {
+      method: "PATCH", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin: superPin, confirmPin: superPinConfirm }),
+    });
+    const data = await res.json();
+    setSavingSuperPin(false);
+    if (!res.ok) { setSuperPinError(data.error ?? "Failed."); }
+    else { setSuperPinSuccess("Superadmin PIN updated."); setSuperPin(""); setSuperPinConfirm(""); }
+  };
+
+  const staffMembers = users.filter((u) => u.role !== "superadmin");
+
+  return (
+    <div className="min-h-screen bg-[hsl(270,20%,98%)]">
+      {/* Header */}
+      <div className="bg-white border-b border-border/50 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+          <button
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Hub
+          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-foreground hidden sm:block">{user?.name}</span>
+            <Button size="sm" variant="outline" onClick={() => logout().then(() => setLocation("/"))} className="gap-1.5 text-xs">
+              Sign out
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Page title */}
+        <div>
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-primary/8 text-primary px-3 py-1.5 rounded-full mb-3">
+            {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+            {isSuperAdmin ? "Super Administrator" : isAdmin ? "Administrator" : "Profile"}
+          </div>
+          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-serif)" }}>
+            Profile &amp; Settings
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">Manage your account and {isAdmin ? "your team" : "PIN"} settings.</p>
+        </div>
+
+        {/* My account info */}
+        <Section icon={<User className="w-3.5 h-3.5" />} title="My Account">
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border/40">
+            <div className="w-12 h-12 rounded-full bg-primary/15 text-primary flex items-center justify-center text-lg font-bold uppercase shrink-0">
+              {user?.name.charAt(0)}
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">{user?.name}</p>
+              <div className="mt-1">{user && roleBadge(user.role as Role)}</div>
+            </div>
+          </div>
+        </Section>
+
+        {/* Change my PIN */}
+        <Section icon={<KeyRound className="w-3.5 h-3.5" />} title="Change My PIN">
+          <form onSubmit={handleMyPin} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <PinInput value={myPin} onChange={(v) => { setMyPin(v); setMyPinError(""); setMyPinSuccess(""); }} placeholder="New PIN (4–8 digits)" />
+              <PinInput value={myPinConfirm} onChange={(v) => { setMyPinConfirm(v); setMyPinError(""); setMyPinSuccess(""); }} placeholder="Confirm new PIN" />
+            </div>
+            {myPinError && <p className="text-destructive text-xs">{myPinError}</p>}
+            {myPinSuccess && <p className="text-emerald-600 text-xs font-medium">{myPinSuccess}</p>}
+            <Button type="submit" disabled={savingMyPin} size="sm" className="gap-1.5">
+              <KeyRound className="w-3.5 h-3.5" />
+              {savingMyPin ? "Saving…" : "Update PIN"}
+            </Button>
+          </form>
+        </Section>
+
+        {/* Superadmin: change own (superadmin) PIN */}
+        {isSuperAdmin && (
+          <Section icon={<Crown className="w-3.5 h-3.5" />} title="Superadmin PIN">
+            <p className="text-xs text-muted-foreground mb-4">Default PIN is <strong>1111</strong>. Change it on first use.</p>
+            <form onSubmit={handleSuperPin} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <PinInput value={superPin} onChange={(v) => { setSuperPin(v); setSuperPinError(""); setSuperPinSuccess(""); }} placeholder="New PIN (4–8 digits)" />
+                <PinInput value={superPinConfirm} onChange={(v) => { setSuperPinConfirm(v); setSuperPinError(""); setSuperPinSuccess(""); }} placeholder="Confirm new PIN" />
+              </div>
+              {superPinError && <p className="text-destructive text-xs">{superPinError}</p>}
+              {superPinSuccess && <p className="text-emerald-600 text-xs font-medium">{superPinSuccess}</p>}
+              <Button type="submit" disabled={savingSuperPin} size="sm" variant="outline" className="gap-1.5">
+                <KeyRound className="w-3.5 h-3.5" />
+                {savingSuperPin ? "Saving…" : "Update Superadmin PIN"}
+              </Button>
+            </form>
+          </Section>
+        )}
+
+        {/* Admin+: Add new user */}
+        {isAdmin && (
+          <Section icon={<Plus className="w-3.5 h-3.5" />} title="Add New User">
+            <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3">
+              <Input
+                value={newName}
+                onChange={(e) => { setNewName(e.target.value); setAddError(""); setAddSuccess(""); }}
+                placeholder="Staff name (e.g. Jane Doe)"
+                className="flex-1"
+              />
+              <div className="w-full sm:w-44">
+                <PinInput value={newPin} onChange={(v) => { setNewPin(v); setAddError(""); setAddSuccess(""); }} placeholder="4–8 digit PIN" />
+              </div>
+              <Button type="submit" disabled={adding} className="gap-1.5 shrink-0">
+                <Plus className="w-4 h-4" /> {adding ? "Adding…" : "Add"}
+              </Button>
+            </form>
+            {addError && <p className="text-destructive text-xs mt-2">{addError}</p>}
+            {addSuccess && <p className="text-emerald-600 text-xs mt-2 font-medium">{addSuccess}</p>}
+          </Section>
+        )}
+
+        {/* Admin+: Staff members list */}
+        {isAdmin && (
+          <Section icon={<Users className="w-3.5 h-3.5" />} title="Staff Members">
+            <div className="flex items-center justify-between mb-4 -mt-1">
+              <span className="text-xs text-muted-foreground">{staffMembers.length} member{staffMembers.length !== 1 ? "s" : ""}</span>
+              <div className="flex items-center gap-3">
+                {/* Show PINs — superadmin only */}
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => setShowPins((v) => !v)}
+                    className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPins ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    {showPins ? "Hide PINs" : "Show PINs"}
+                  </button>
+                )}
+                <button onClick={fetchUsers} className="text-muted-foreground hover:text-foreground transition-colors" title="Refresh">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {loadingUsers ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              </div>
+            ) : staffMembers.length === 0 ? (
+              <p className="text-muted-foreground text-sm text-center py-8">No staff members yet.</p>
+            ) : (
+              <div className="divide-y divide-border/50">
+                {staffMembers.map((u) => {
+                  const canDelete = isSuperAdmin || (isAdmin && u.role === "basic" && u.id !== user?.id);
+                  const canResetPin = isSuperAdmin || (isAdmin && u.role === "basic");
+                  const canChangeRole = isSuperAdmin;
+                  return (
+                    <div key={u.id} className="flex items-center gap-3 py-3 group">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-sm uppercase">
+                        {u.name.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm text-foreground">{u.name}</span>
+                          {roleBadge(u.role)}
+                        </div>
+                        {showPins && isSuperAdmin && rawPins[u.id] && (
+                          <span className="text-xs text-muted-foreground font-mono">PIN: {rawPins[u.id]}</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {canChangeRole && (
+                          <button
+                            onClick={() => { setRoleTarget(u); setRoleValue(u.role === "admin" ? "basic" : "admin"); setRoleError(""); }}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-[hsl(260,40%,25%)] hover:bg-[hsl(260,40%,25%)]/10 transition-colors"
+                            title="Change role"
+                          >
+                            <ShieldCheck className="w-4 h-4" />
+                          </button>
+                        )}
+                        {canResetPin && (
+                          <button
+                            onClick={() => { setResetTarget(u); setResetPin(""); setResetConfirm(""); setResetError(""); }}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title="Reset PIN"
+                          >
+                            <KeyRound className="w-4 h-4" />
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleteTarget(u)}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                            title="Delete user"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Section>
+        )}
+
+        <div className="flex justify-end pb-4">
+          <Button variant="outline" onClick={() => logout().then(() => setLocation("/"))} className="gap-2 text-sm">
+            Sign out
+          </Button>
+        </div>
+      </div>
+
+      {/* Delete Confirm Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete user?</DialogTitle>
+            <DialogDescription>Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>{deleting ? "Deleting…" : "Delete"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset PIN Dialog */}
+      <Dialog open={!!resetTarget} onOpenChange={(o) => { if (!o) { setResetTarget(null); setResetPin(""); setResetConfirm(""); setResetError(""); } }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Reset PIN for {resetTarget?.name}</DialogTitle>
+            <DialogDescription>Enter a new 4–8 digit PIN and confirm it.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleResetPin} className="space-y-3 mt-2">
+            <PinInput value={resetPin} onChange={(v) => { setResetPin(v); setResetError(""); }} placeholder="New PIN (4–8 digits)" autoFocus />
+            <PinInput value={resetConfirm} onChange={(v) => { setResetConfirm(v); setResetError(""); }} placeholder="Confirm PIN" />
+            {resetError && <p className="text-destructive text-xs">{resetError}</p>}
+            <DialogFooter className="gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setResetTarget(null)}>Cancel</Button>
+              <Button type="submit" disabled={resetting}>{resetting ? "Saving…" : "Save PIN"}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Role Dialog */}
+      <Dialog open={!!roleTarget} onOpenChange={(o) => !o && setRoleTarget(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Change role for {roleTarget?.name}</DialogTitle>
+            <DialogDescription>Select the new role for this user.</DialogDescription>
+          </DialogHeader>
+          <div className="mt-2 space-y-3">
+            <Select value={roleValue} onValueChange={(v) => setRoleValue(v as "admin" | "basic")}>
+              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="basic">Basic</SelectItem>
+              </SelectContent>
+            </Select>
+            {roleError && <p className="text-destructive text-xs">{roleError}</p>}
+          </div>
+          <DialogFooter className="gap-2 mt-4">
+            <Button variant="outline" onClick={() => setRoleTarget(null)}>Cancel</Button>
+            <Button onClick={handleRoleChange} disabled={savingRole}>{savingRole ? "Saving…" : "Save Role"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

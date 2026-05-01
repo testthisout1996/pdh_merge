@@ -1,19 +1,21 @@
 import * as React from "react";
-import { Redirect } from "wouter";
+import { useLocation, Redirect } from "wouter";
 import { useAuth, type Role } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: Role | Role[];
-  redirectTo?: string;
 }
 
-export function ProtectedRoute({
-  children,
-  requiredRole,
-  redirectTo = "/login",
-}: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { user, loading, openLoginModal } = useAuth();
+  const [location] = useLocation();
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      openLoginModal(location);
+    }
+  }, [loading, user, location, openLoginModal]);
 
   if (loading) {
     return (
@@ -24,7 +26,7 @@ export function ProtectedRoute({
   }
 
   if (!user) {
-    return <Redirect to={redirectTo} />;
+    return null;
   }
 
   if (requiredRole) {

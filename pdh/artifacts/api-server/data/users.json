@@ -10,5 +10,11 @@
     "name": "Administrator",
     "pin": "9999",
     "role": "admin"
+  },
+  {
+    "id": "139815d3-4868-44e1-8f8d-e69945c5bee8",
+    "name": "Amrita Grewal",
+    "pin": "1234",
+    "role": "basic"
   }
 ]
