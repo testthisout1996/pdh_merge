@@ -57,18 +57,26 @@ function PilSearchHero({
   activeTab,
   onTabChange,
   pilToolsRef,
+  heroImgRef,
 }: {
   activeTab: string;
   onTabChange: (tab: string) => void;
   pilToolsRef?: React.RefObject<HTMLParagraphElement | null>;
+  heroImgRef?: React.RefObject<HTMLImageElement | null>;
 }) {
   return (
     <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
       <img
+        ref={heroImgRef}
         src={heroImage}
         alt="Pharmacy interior with staff and customers"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-        style={{ filter: "saturate(0.9)" }}
+        className="absolute w-full object-cover object-center"
+        style={{
+          filter: "saturate(0.9)",
+          height: "130%",
+          top: "-15%",
+          willChange: "transform",
+        }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
@@ -498,9 +506,12 @@ export default function PilSearch() {
   const heroWrapperRef = React.useRef<HTMLDivElement>(null);
   const spacerRef = React.useRef<HTMLDivElement>(null);
   const pilToolsRef = React.useRef<HTMLParagraphElement>(null);
+  const heroImgRef = React.useRef<HTMLImageElement>(null);
   const lockAtRef = React.useRef<number>(0);
   const heroFixedTopRef = React.useRef<number>(0);
   const isLockedRef = React.useRef<boolean>(false);
+
+  const PARALLAX = 0.2;
 
   React.useEffect(() => {
     const page = pageRef.current;
@@ -511,6 +522,7 @@ export default function PilSearch() {
     const onScroll = () => {
       const scrollTop = page.scrollTop;
       const pilEl = pilToolsRef.current;
+      const imgEl = heroImgRef.current;
 
       // While unlocked: recalculate lock threshold every frame so it reflects
       // the element's true settled position after the mount animation finishes.
@@ -522,6 +534,13 @@ export default function PilSearch() {
       }
 
       const shouldLock = lockAtRef.current > 0 && scrollTop >= lockAtRef.current;
+
+      // Parallax: drive the image at PARALLAX fraction of scroll speed.
+      // Freeze at lockAt value when locked so the image is stable.
+      if (imgEl) {
+        const shift = Math.min(scrollTop, lockAtRef.current > 0 ? lockAtRef.current : scrollTop);
+        imgEl.style.transform = `translateY(${shift * PARALLAX}px)`;
+      }
 
       // Only act on a change — and write directly to the DOM so both the hero
       // position and spacer height update atomically in the same paint frame,
@@ -558,18 +577,17 @@ export default function PilSearch() {
       <Navbar />
 
       <div>
-        <div ref={heroWrapperRef} style={{ boxShadow: "0 6px 28px rgba(0,0,0,0.16)" }}>
+        <div ref={heroWrapperRef}>
           <PilSearchHero
             pilToolsRef={pilToolsRef}
+            heroImgRef={heroImgRef}
             activeTab={activeTab}
             onTabChange={setActiveTab}
           />
         </div>
 
-        {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock.
-            paddingBottom provides a permanent gap between hero bottom and content, regardless
-            of locked state, without causing a jump at lock time. */}
-        <div ref={spacerRef} style={{ height: 0, paddingBottom: "24px" }} />
+        {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock */}
+        <div ref={spacerRef} style={{ height: 0 }} />
 
         <main className="flex-1 container max-w-6xl mx-auto px-4 md:px-6 py-8">
           <motion.div
