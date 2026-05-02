@@ -137,20 +137,111 @@ export default function Profile() {
   const [scrolled, setScrolled] = React.useState(false);
   const reactId = React.useId();
   const navbarMaskId = `profile-navbar-mask-${reactId.replace(/[:]/g, "")}`;
+
+  // PIL-Search-style scroll system
+  const NAVBAR_TOP_GAP = 16;
+  const NAVBAR_BAR_H  = 64;
+  const NAVBAR_BOTTOM = NAVBAR_TOP_GAP + NAVBAR_BAR_H; // 80px
+  const GAP           = 4;
+  const LOCK_TARGET_Y = NAVBAR_BOTTOM + GAP;           // 84px
+  const HERO_H        = 531;
+  const BLUR_MAX      = 10;
+  const PARALLAX      = 0.2;
+
+  const pageRef          = React.useRef<HTMLDivElement>(null);
+  const heroWrapperRef   = React.useRef<HTMLDivElement>(null);
+  const spacerRef        = React.useRef<HTMLDivElement>(null);
+  const blurLayerRef     = React.useRef<HTMLDivElement>(null);
+  const heroImgRef       = React.useRef<HTMLImageElement>(null);
   const badgeSentinelRef = React.useRef<HTMLDivElement>(null);
+  const lockAtRef        = React.useRef<number>(0);
+  const heroFixedTopRef  = React.useRef<number>(0);
+  const isLockedRef      = React.useRef<boolean>(false);
+
+  // Section refs for smooth-scroll buttons
+  const pinSectionRef      = React.useRef<HTMLDivElement>(null);
+  const addUserSectionRef  = React.useRef<HTMLDivElement>(null);
+  const staffSectionRef    = React.useRef<HTMLDivElement>(null);
+
+  const scrollToSection = React.useCallback((ref: React.RefObject<HTMLDivElement | null>) => {
+    const page = pageRef.current;
+    const el   = ref.current;
+    if (!page || !el) return;
+    const lockAt = lockAtRef.current;
+    // Ensure the hero is locked first, then jump to section
+    if (lockAt > 0 && page.scrollTop < lockAt) {
+      page.scrollTo({ top: lockAt, behavior: "smooth" });
+      setTimeout(() => {
+        page.scrollTo({ top: el.offsetTop - NAVBAR_BAR_H, behavior: "smooth" });
+      }, 350);
+    } else {
+      page.scrollTo({ top: el.offsetTop - NAVBAR_BAR_H, behavior: "smooth" });
+    }
+  }, []);
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      // Lock the navbar when the sentinel (just above the badge) reaches the navbar bottom (64 px from top)
-      const threshold = badgeSentinelRef.current
-        ? badgeSentinelRef.current.getBoundingClientRect().top + window.scrollY - 64
-        : 20;
-      setScrolled(window.scrollY >= threshold);
+    const page    = pageRef.current;
+    const heroEl  = heroWrapperRef.current;
+    const spacerEl = spacerRef.current;
+    if (!page || !heroEl || !spacerEl) return;
+
+    const onScroll = () => {
+      const scrollTop = page.scrollTop;
+      const sentinelEl = badgeSentinelRef.current;
+      const imgEl      = heroImgRef.current;
+
+      // Recalculate lock threshold every frame while unlocked (sentinel-based, not buttons-based)
+      if (!isLockedRef.current && sentinelEl) {
+        const rect      = sentinelEl.getBoundingClientRect();
+        const domY      = rect.top + scrollTop;
+        lockAtRef.current      = Math.max(0, domY - LOCK_TARGET_Y);
+        heroFixedTopRef.current = -lockAtRef.current;
+      }
+
+      const shouldLock = lockAtRef.current > 0 && scrollTop >= lockAtRef.current;
+
+      // Parallax — freeze at lockAt when locked
+      if (imgEl) {
+        const shift = Math.min(scrollTop, lockAtRef.current > 0 ? lockAtRef.current : scrollTop);
+        imgEl.style.transform = `translateY(${shift * PARALLAX}px)`;
+      }
+
+      // Blur overlay ramps 0 → BLUR_MAX as scroll approaches lockAt
+      const blurEl = blurLayerRef.current;
+      if (blurEl) {
+        const p      = lockAtRef.current > 0 ? Math.min(1, scrollTop / lockAtRef.current) : 0;
+        const blurPx = (p * BLUR_MAX).toFixed(2);
+        blurEl.style.backdropFilter = `blur(${blurPx}px)`;
+        (blurEl.style as CSSStyleDeclaration & { webkitBackdropFilter: string }).webkitBackdropFilter = `blur(${blurPx}px)`;
+        blurEl.style.opacity = String(p);
+      }
+
+      // Lock / unlock the hero imperatively (same-frame DOM write to avoid jitter)
+      if (shouldLock !== isLockedRef.current) {
+        isLockedRef.current = shouldLock;
+        if (shouldLock) {
+          heroEl.style.position = "fixed";
+          heroEl.style.top      = `${heroFixedTopRef.current}px`;
+          heroEl.style.left     = "0";
+          heroEl.style.right    = "0";
+          heroEl.style.zIndex   = "30";
+          spacerEl.style.height = `${HERO_H}px`;
+        } else {
+          heroEl.style.position = "";
+          heroEl.style.top      = "";
+          heroEl.style.left     = "";
+          heroEl.style.right    = "";
+          heroEl.style.zIndex   = "";
+          spacerEl.style.height = "0px";
+        }
+      }
+
+      // Drive the navbar scrolled state
+      setScrolled(shouldLock);
     };
-    // Run once on mount so initial state is correct
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    page.addEventListener("scroll", onScroll, { passive: true });
+    return () => page.removeEventListener("scroll", onScroll);
   }, []);
 
   const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
@@ -334,7 +425,7 @@ export default function Profile() {
     );
 
   return (
-    <div className="min-h-screen bg-[hsl(270,20%,98%)]">
+    <div ref={pageRef} className="h-[100dvh] overflow-y-auto bg-[hsl(270,20%,98%)] selection:bg-primary/20">
       {/* Navbar */}
       <motion.div
         initial={{ y: -80, opacity: 0 }}
@@ -454,9 +545,29 @@ export default function Profile() {
         </div>
       </motion.div>
 
+      {/* Blur overlay — same as PIL Search: sits above hero (z-30) below navbar (z-50), ramps with scroll */}
+      <div
+        ref={blurLayerRef}
+        style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0,
+          height: `${NAVBAR_BOTTOM}px`,
+          zIndex: 40,
+          pointerEvents: "none",
+          opacity: 0,
+          backdropFilter: "blur(0px)",
+          WebkitBackdropFilter: "blur(0px)",
+          maskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+        } as React.CSSProperties}
+      />
+
+      {/* Hero wrapper — locked to fixed imperatively by the scroll handler */}
+      <div ref={heroWrapperRef}>
       {/* Hero section — matches PIL Search hero (531px) */}
       <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
         <img
+          ref={heroImgRef}
           src={profileHeroImg}
           alt="Pharmacy setting"
           className="absolute w-full object-cover object-center"
@@ -509,36 +620,43 @@ export default function Profile() {
 
             {/* Role-gated quick-jump buttons */}
             <div className="flex items-center gap-2 flex-wrap">
-              <a
-                href="#section-pin"
+              <button
+                type="button"
+                onClick={() => scrollToSection(pinSectionRef)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
               >
                 <KeyRound className="w-4 h-4" /> Change PIN
-              </a>
+              </button>
               {isAdmin && (
-                <a
-                  href="#section-add-user"
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(addUserSectionRef)}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" /> Add User
-                </a>
+                </button>
               )}
               {isAdmin && (
-                <a
-                  href="#section-staff"
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(staffSectionRef)}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
                 >
                   <Users className="w-4 h-4" /> Staff Members
-                </a>
+                </button>
               )}
             </div>
           </motion.div>
         </div>
       </div>
+      </div>{/* end heroWrapperRef */}
+
+      {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock */}
+      <div ref={spacerRef} style={{ height: 0 }} />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-8 space-y-6">
         {/* Change my PIN */}
-        <div id="section-pin">
+        <div ref={pinSectionRef}>
         <Section icon={<KeyRound className="w-3.5 h-3.5" />} title="Change My PIN">
           <form onSubmit={handleMyPin} className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -557,7 +675,7 @@ export default function Profile() {
 
         {/* Admin+: Add new user */}
         {isAdmin && (
-          <div id="section-add-user">
+          <div ref={addUserSectionRef}>
           <Section icon={<Plus className="w-3.5 h-3.5" />} title="Add New User">
             <form onSubmit={handleAdd} className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
@@ -594,7 +712,7 @@ export default function Profile() {
 
         {/* Admin+: Staff members list */}
         {isAdmin && (
-          <div id="section-staff">
+          <div ref={staffSectionRef}>
           <Section
             icon={<Users className="w-3.5 h-3.5" />}
             title="Staff Members"
