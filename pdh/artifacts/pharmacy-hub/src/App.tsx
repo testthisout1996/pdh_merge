@@ -11,6 +11,7 @@ import Profile from "@/pages/Profile";
 import { PilUpdateProvider } from "@/context/PilUpdateContext";
 import { PilUpdateFloatingPanel } from "@/components/pil/PilUpdateFloatingPanel";
 import { AuthProvider } from "@/context/AuthContext";
+import { SettingsProvider } from "@/context/SettingsContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LoginModal } from "@/components/LoginModal";
 
@@ -67,14 +68,16 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <PilUpdateProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-            </WouterRouter>
-            <PilUpdateFloatingPanel />
-            <LoginModal />
-          </PilUpdateProvider>
-          <Toaster />
+          <SettingsProvider>
+            <PilUpdateProvider>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+              </WouterRouter>
+              <PilUpdateFloatingPanel />
+              <LoginModal />
+            </PilUpdateProvider>
+            <Toaster />
+          </SettingsProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

@@ -26,13 +26,23 @@ pnpm workspace monorepo using TypeScript. Hosts the **Pharmacy Dispensing Hub** 
 ## Auth System
 
 - PIN-based login at `/login`. All routes except `/login` are protected — unauthenticated users are redirected.
-- Three roles: `superadmin` (PIN: 1111), `admin` (PIN: 9999, changeable), `basic` (new users default).
-- Superadmin: full control — change roles, reset any PIN, manage admin PIN, add/delete users.
+- Three roles: `superadmin` (default `ADMIN`/`230790`), `admin`, `basic`.
+- Superadmin: full control — change roles, reset any PIN, manage admin PIN, add/delete users, system controls.
 - Admin: add/delete basic users, reset basic user PINs.
-- Basic: access to all tools. Can change their own PIN.
-- `/admin` page: accessible to admin and superadmin only. Non-admins redirected to `/`.
+- Basic: access to tools. Can change their own PIN.
 - User store: `data/users.json` relative to api-server cwd (auto-created on first run).
-- Frontend: `AuthContext.tsx`, `ProtectedRoute.tsx`, `pages/Login.tsx`, `pages/Admin.tsx`.
+- Frontend: `AuthContext.tsx`, `SettingsContext.tsx`, `ProtectedRoute.tsx`.
+
+## System Controls (Superadmin only)
+
+- `GET /api/settings` — public endpoint; returns `{ idleTimeoutSeconds, disabledFeatures[] }`.
+- `PATCH /api/settings` — superadmin only; update idle timeout and disabled features.
+- `POST /api/admin/logout-all` — superadmin only; destroys all active sessions except the caller's.
+- Settings persisted to `data/settings.json` in the api-server working directory.
+- `SettingsContext.tsx` wraps the app and fetches `/api/settings` on mount.
+- Idle timeout from settings is passed to `useInactivityTimer` (replaces hardcoded 60s).
+- Feature gates (`pil-search`, `pil-printer`): when disabled, non-superadmin users see an "Access Disabled" page.
+- Profile page hero: superadmin sees a **System Controls** card to the right of MY ACCOUNT. Contains idle timeout input (minutes), PIL Search / PIL Printer toggles, Save Settings and Log Off All Users action buttons aligned with the quick-jump buttons on the left.
 
 ## Pharmacy Hub design notes
 

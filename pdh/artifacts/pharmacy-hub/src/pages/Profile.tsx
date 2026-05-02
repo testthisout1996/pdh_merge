@@ -17,9 +17,14 @@ import {
   User,
   Pencil,
   Search,
+  PowerOff,
+  Clock,
+  Sliders,
+  Save,
 } from "lucide-react";
 import profileHeroImg from "@assets/profile-hero.webp";
 import { useAuth } from "@/context/AuthContext";
+import { useSettings } from "@/context/SettingsContext";
 import { useInactivityTimer } from "@/hooks/useInactivityTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,6 +135,7 @@ function Section({
 
 export default function Profile() {
   const { user, logout, refresh } = useAuth();
+  const { settings, reload: reloadSettings } = useSettings();
   const [, setLocation] = useLocation();
   const isSuperAdmin = user?.role === "superadmin";
   const isAdmin = user?.role === "admin" || isSuperAdmin;
@@ -257,9 +263,11 @@ export default function Profile() {
     return () => page.removeEventListener("scroll", onScroll);
   }, []);
 
-  const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
-    logout().then(() => setLocation("/"));
-  });
+  const { progress, secondsLeft } = useInactivityTimer(
+    !!user,
+    () => { logout().then(() => setLocation("/")); },
+    settings.idleTimeoutSeconds * 1000
+  );
   const ringCircumference = 2 * Math.PI * 14;
   const ringColor =
     progress > 0.25 ? "hsl(260,40%,40%)" : progress > 0.083 ? "#f59e0b" : "#ef4444";
@@ -294,6 +302,73 @@ export default function Profile() {
   const [savingUsername, setSavingUsername] = React.useState(false);
 
   const [staffSearch, setStaffSearch] = React.useState("");
+
+  // System Controls state (superadmin only)
+  const [localIdleMin, setLocalIdleMin] = React.useState<number | "">(1);
+  const [localDisabled, setLocalDisabled] = React.useState<string[]>([]);
+  const [savingSettings, setSavingSettings] = React.useState(false);
+  const [settingsMsg, setSettingsMsg] = React.useState("");
+  const [logoutAllBusy, setLogoutAllBusy] = React.useState(false);
+  const [logoutAllMsg, setLogoutAllMsg] = React.useState("");
+
+  // Sync local System Controls state when server settings load
+  React.useEffect(() => {
+    setLocalIdleMin(Math.round(settings.idleTimeoutSeconds / 60));
+    setLocalDisabled(settings.disabledFeatures);
+  }, [settings]);
+
+  const handleSaveSettings = React.useCallback(async () => {
+    setSavingSettings(true);
+    setSettingsMsg("");
+    const idleSec = typeof localIdleMin === "number" ? localIdleMin * 60 : 60;
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idleTimeoutSeconds: idleSec, disabledFeatures: localDisabled }),
+      });
+      if (res.ok) {
+        await reloadSettings();
+        setSettingsMsg("Saved.");
+        setTimeout(() => setSettingsMsg(""), 2500);
+      } else {
+        setSettingsMsg("Failed to save.");
+      }
+    } catch {
+      setSettingsMsg("Failed to save.");
+    } finally {
+      setSavingSettings(false);
+    }
+  }, [localIdleMin, localDisabled, reloadSettings]);
+
+  const handleLogoutAll = React.useCallback(async () => {
+    setLogoutAllBusy(true);
+    setLogoutAllMsg("");
+    try {
+      const res = await fetch("/api/admin/logout-all", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLogoutAllMsg(`${data.loggedOut} session${data.loggedOut === 1 ? "" : "s"} ended.`);
+      } else {
+        setLogoutAllMsg("Failed.");
+      }
+    } catch {
+      setLogoutAllMsg("Failed.");
+    } finally {
+      setLogoutAllBusy(false);
+      setTimeout(() => setLogoutAllMsg(""), 3000);
+    }
+  }, []);
+
+  const toggleFeature = React.useCallback((key: string) => {
+    setLocalDisabled((prev) =>
+      prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]
+    );
+  }, []);
 
   const [myPin, setMyPin] = React.useState("");
   const [myPinConfirm, setMyPinConfirm] = React.useState("");
@@ -600,7 +675,10 @@ export default function Profile() {
               </p>
             </div>
 
-            {/* Card + buttons: card width is capped imperatively to the measured buttons row width */}
+            {/* Hero bottom: two-column — MY ACCOUNT (left) + SYSTEM CONTROLS (right, superadmin) */}
+            <div className="flex items-end gap-4">
+
+            {/* LEFT COLUMN: My Account card + quick-jump buttons */}
             <div className="flex flex-col gap-5">
             {/* My Account card — white background */}
             <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3" style={cardMaxW ? { maxWidth: cardMaxW } : undefined}>
@@ -706,7 +784,105 @@ export default function Profile() {
                 <Users className="w-4 h-4" /> Staff Members
               </button>
             </div>
-            </div>{/* end w-fit card+buttons wrapper */}
+            </div>{/* end LEFT COLUMN */}
+
+            {/* RIGHT COLUMN: System Controls card (superadmin only) */}
+            {isSuperAdmin && (
+              <div className="flex flex-col gap-5">
+                {/* System Controls card */}
+                <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3 min-w-[280px]">
+                  {/* Header */}
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                    <Sliders className="w-3 h-3" /> System Controls
+                  </p>
+
+                  <div className="border-t border-border/40 -mx-5" />
+
+                  {/* Idle Timeout */}
+                  <div className="flex flex-col gap-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" /> Idle Logout Timeout
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={1}
+                        max={60}
+                        value={localIdleMin}
+                        onChange={(e) => {
+                          const v = e.target.value === "" ? "" : Math.max(1, Math.min(60, parseInt(e.target.value, 10) || 1));
+                          setLocalIdleMin(v as number | "");
+                        }}
+                        className="w-16 py-1.5 px-2.5 rounded-md border border-border bg-muted/20 text-sm font-mono text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+                      />
+                      <span className="text-xs text-muted-foreground">minutes</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border/40 -mx-5" />
+
+                  {/* Feature toggles */}
+                  <div className="flex flex-col gap-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Site Access
+                    </p>
+                    {[
+                      { key: "pil-search",  label: "PIL Search" },
+                      { key: "pil-printer", label: "PIL Printer" },
+                    ].map(({ key, label }) => {
+                      const isDisabled = localDisabled.includes(key);
+                      return (
+                        <div key={key} className="flex items-center justify-between gap-3">
+                          <span className="text-xs text-foreground/80 font-medium">{label}</span>
+                          <button
+                            type="button"
+                            onClick={() => toggleFeature(key)}
+                            title={isDisabled ? "Enable for all users" : "Disable for non-superadmin users"}
+                            className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none ${isDisabled ? "bg-destructive/60" : "bg-emerald-500"}`}
+                          >
+                            <span
+                              className={`pointer-events-none block h-4 w-4 rounded-full bg-white shadow-sm ring-0 transition-transform ${isDisabled ? "translate-x-0" : "translate-x-4"}`}
+                            />
+                          </button>
+                        </div>
+                      );
+                    })}
+                    <p className="text-[10px] text-muted-foreground/70 leading-tight pt-0.5">
+                      When disabled, only Super Admin can access these tools.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Action buttons row — aligned with quick-jump buttons on left */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveSettings}
+                    disabled={savingSettings}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200 disabled:opacity-60"
+                  >
+                    <Save className="w-4 h-4" />
+                    {savingSettings ? "Saving…" : "Save Settings"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogoutAll}
+                    disabled={logoutAllBusy}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-destructive/70 text-white border border-destructive/40 hover:bg-destructive/85 transition-all duration-200 disabled:opacity-60"
+                  >
+                    <PowerOff className="w-4 h-4" />
+                    {logoutAllBusy ? "Logging out…" : "Log Off All Users"}
+                  </button>
+                  {(settingsMsg || logoutAllMsg) && (
+                    <span className="text-xs text-white/80 font-medium">
+                      {settingsMsg || logoutAllMsg}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            </div>{/* end two-column wrapper */}
           </motion.div>
         </div>
       </div>
