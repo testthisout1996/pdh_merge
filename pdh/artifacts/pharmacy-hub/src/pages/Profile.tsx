@@ -18,6 +18,7 @@ import {
   Search,
   LogOut,
 } from "lucide-react";
+import profileHeroImg from "@assets/profile-hero.webp";
 import { useAuth } from "@/context/AuthContext";
 import { useInactivityTimer } from "@/hooks/useInactivityTimer";
 import { Button } from "@/components/ui/button";
@@ -447,7 +448,7 @@ export default function Profile() {
       {/* Hero section — matches PIL Search hero (531px) */}
       <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
         <img
-          src="/pharmacy-bg.jpg"
+          src={profileHeroImg}
           alt="Pharmacy setting"
           className="absolute w-full object-cover object-center"
           style={{ filter: "saturate(0.9)", height: "130%", top: "-15%", willChange: "transform" }}
