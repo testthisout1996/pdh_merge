@@ -4,9 +4,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
-import ToolPlaceholder from "@/pages/tool-placeholder";
 import PilSearch from "@/pages/pil-search";
 import PilPrinterComingSoon from "@/pages/pil-printer-coming-soon";
+import PrednisoloneCalculatorComingSoon from "@/pages/prednisolone-calculator-coming-soon";
 import Profile from "@/pages/Profile";
 import { PilUpdateProvider } from "@/context/PilUpdateContext";
 import { PilUpdateFloatingPanel } from "@/components/pil/PilUpdateFloatingPanel";
@@ -41,35 +41,21 @@ function Router() {
         )}
       </Route>
 
-      {/* Protected tools */}
+      {/* PIL Search — admin and superadmin only */}
       <Route path="/tools/pils/pil-search">
         {() => (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={["admin", "superadmin"]}>
             <PilSearch />
           </ProtectedRoute>
         )}
       </Route>
-      <Route path="/tools/pils/pil-printer">
-        {() => (
-          <ProtectedRoute>
-            <PilPrinterComingSoon />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/tools/pil-printer">
-        {() => (
-          <ProtectedRoute>
-            <PilSearch />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/tools/prednisolone-calculator">
-        {() => (
-          <ProtectedRoute>
-            <ToolPlaceholder toolName="Prednisolone Reducing Regimen Calculator" />
-          </ProtectedRoute>
-        )}
-      </Route>
+
+      {/* PIL Printer coming soon — public */}
+      <Route path="/tools/pils/pil-printer" component={PilPrinterComingSoon} />
+      <Route path="/tools/pil-printer" component={PilPrinterComingSoon} />
+
+      {/* Prednisolone Calculator coming soon — public */}
+      <Route path="/tools/prednisolone-calculator" component={PrednisoloneCalculatorComingSoon} />
 
       <Route component={NotFound} />
     </Switch>

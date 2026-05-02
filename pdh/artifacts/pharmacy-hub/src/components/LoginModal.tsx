@@ -167,15 +167,6 @@ export function LoginModal() {
                     </button>
                   </div>
 
-                  {/* PIN entry dots */}
-                  {pin.length > 0 && (
-                    <div className="flex items-center justify-center gap-1.5 mt-3">
-                      {Array.from({ length: pin.length }).map((_, i) => (
-                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      ))}
-                    </div>
-                  )}
-
                   {error && (
                     <p className="text-destructive text-xs font-medium mt-2 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-destructive inline-block shrink-0" />

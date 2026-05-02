@@ -83,7 +83,7 @@ function PinInput({
         value={value}
         onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 8))}
         placeholder={placeholder ?? "4–8 digit PIN"}
-        className="w-full pr-10 py-2 px-3 rounded-lg border border-border bg-muted/20 text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+        className="w-full pr-10 py-2 px-3 rounded-md border border-border bg-muted/20 text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
       />
       <button
         type="button"
@@ -107,7 +107,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+    <div className="bg-white border border-border/40 rounded-md p-6 shadow-sm">
       <h2 className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground flex items-center gap-2 mb-5">
         {icon} {title}
       </h2>
@@ -308,7 +308,7 @@ export default function Profile() {
 
         {/* My account info */}
         <Section icon={<User className="w-3.5 h-3.5" />} title="My Account">
-          <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border/40">
+          <div className="flex items-center gap-4 p-4 rounded-md bg-muted/30 border border-border/40">
             <div className="w-12 h-12 rounded-full bg-primary/15 text-primary flex items-center justify-center text-lg font-bold uppercase shrink-0">
               {user?.name.charAt(0)}
             </div>
