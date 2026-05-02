@@ -364,23 +364,23 @@ export default function Profile() {
             </svg>
 
             <div className="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center h-16 px-6 gap-4">
-              {/* Left: Back to Hub */}
-              <div className="justify-self-start">
-                <button
-                  onClick={() => setLocation("/")}
-                  className="flex items-center gap-1.5 text-sm font-semibold text-foreground/70 hover:text-foreground transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Back to Hub
-                </button>
-              </div>
+              {/* Left: empty spacer — keeps the PDH logo visible */}
+              <div />
 
               {/* Centre: page label */}
               <span className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground">
                 Profile &amp; Settings
               </span>
 
-              {/* Right: countdown ring + name + sign out */}
-              <div className="justify-self-end flex items-center gap-3">
+              {/* Right: Back to Hub + countdown ring + name + sign out */}
+              <div className="justify-self-end flex items-center gap-4">
+                <button
+                  onClick={() => setLocation("/")}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-foreground/70 hover:text-foreground transition-colors hidden sm:flex"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to Hub
+                </button>
+                <div className="w-px h-5 bg-border/50 hidden sm:block" />
                 <div
                   className="relative shrink-0 w-8 h-8"
                   title={`Auto sign-out in ${secondsLeft}s`}
