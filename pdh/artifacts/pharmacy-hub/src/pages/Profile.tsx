@@ -568,7 +568,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-            className="flex flex-col gap-5 w-fit max-w-full"
+            className="flex flex-col gap-5"
           >
             {/* Role badge + title + description */}
             <div>
@@ -586,6 +586,8 @@ export default function Profile() {
               </p>
             </div>
 
+            {/* Card + buttons share a w-fit wrapper so card width = buttons row width */}
+            <div className="w-fit max-w-full flex flex-col gap-5">
             {/* My Account card — white background */}
             <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -635,7 +637,7 @@ export default function Profile() {
                     ]).map((perm) => (
                       <span
                         key={perm}
-                        className="inline-flex items-center text-[10px] font-semibold tracking-wide text-foreground/70 bg-muted/60 border border-border/50 rounded-md px-2 py-0.5 whitespace-nowrap"
+                        className="inline-flex items-center text-[10px] font-semibold tracking-wide text-foreground/70 bg-muted/60 border border-border/50 rounded-md px-2 py-0.5"
                       >
                         {perm}
                       </span>
@@ -691,6 +693,7 @@ export default function Profile() {
                 </button>
               )}
             </div>
+            </div>{/* end w-fit card+buttons wrapper */}
           </motion.div>
         </div>
       </div>
