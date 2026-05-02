@@ -643,11 +643,13 @@ export default function Profile() {
                       "Assign roles",
                       "Add / remove users",
                       "PIL Search",
+                      "PIL Printer",
                     ] : isAdmin ? [
                       "Manage basic users",
                       "Reset basic PINs",
                       "Add basic users",
                       "PIL Search",
+                      "PIL Printer",
                     ] : [
                       "Change own PIN",
                       "PIL Printer",
