@@ -19,5 +19,12 @@
     "username": "JSMITH",
     "pin": "1234",
     "role": "basic"
+  },
+  {
+    "id": "15f5a621-1059-4bb4-9d82-2c54efb338e4",
+    "name": "Maha Abdullahi",
+    "username": "MAHA",
+    "pin": "123456",
+    "role": "basic"
   }
 ]
