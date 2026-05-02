@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useLocation } from "wouter";
+import { motion } from "framer-motion";
 import {
   Users,
   Plus,
@@ -15,8 +16,10 @@ import {
   User,
   Pencil,
   Search,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useInactivityTimer } from "@/hooks/useInactivityTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -129,6 +132,23 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const isSuperAdmin = user?.role === "superadmin";
   const isAdmin = user?.role === "admin" || isSuperAdmin;
+
+  const [scrolled, setScrolled] = React.useState(false);
+  const reactId = React.useId();
+  const navbarMaskId = `profile-navbar-mask-${reactId.replace(/[:]/g, "")}`;
+
+  React.useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
+    logout().then(() => setLocation("/"));
+  });
+  const ringCircumference = 2 * Math.PI * 14;
+  const ringColor =
+    progress > 0.25 ? "hsl(260,40%,40%)" : progress > 0.083 ? "#f59e0b" : "#ef4444";
 
   const [users, setUsers] = React.useState<UserRow[]>([]);
   const [loadingUsers, setLoadingUsers] = React.useState(false);
@@ -305,25 +325,101 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-[hsl(270,20%,98%)]">
-      {/* Header */}
-      <div className="bg-white border-b border-border/50 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-          <button
-            onClick={() => setLocation("/")}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      {/* Navbar */}
+      <motion.div
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        className="fixed top-0 left-0 right-0 z-50 pointer-events-none"
+      >
+        <div
+          className={`flex justify-center transition-all duration-300 ease-out ${
+            scrolled ? "px-0 pt-0" : "px-4 md:px-6 pt-4"
+          }`}
+        >
+          <header
+            className={`pointer-events-auto relative w-full overflow-hidden transition-all duration-300 ease-out ${
+              scrolled
+                ? "max-w-none rounded-none border-x-0 border-t-0 border-b border-border/60 shadow-md shadow-black/5"
+                : "max-w-6xl rounded-md border border-border/30 shadow-sm"
+            }`}
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Hub
-          </button>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-foreground hidden sm:block">{user?.name}</span>
-            <Button size="sm" variant="outline" onClick={() => logout().then(() => setLocation("/"))} className="gap-1.5 text-xs">
-              Sign out
-            </Button>
-          </div>
-        </div>
-      </div>
+            {/* SVG background with PDH cutout */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
+              <defs>
+                <mask id={navbarMaskId} maskUnits="userSpaceOnUse">
+                  <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                  <text
+                    x="24" y="50%" dominantBaseline="central" fill="black"
+                    style={{ fontFamily: "var(--font-anton)", fontSize: "48px", letterSpacing: "-0.02em" }}
+                  >PDH</text>
+                </mask>
+              </defs>
+              <rect x="0" y="0" width="100%" height="100%" fill="white" mask={`url(#${navbarMaskId})`} />
+              <text
+                x="24" y="50%" dominantBaseline="central" fill="none"
+                stroke="rgba(44,27,61,0.55)" strokeWidth="1"
+                style={{ fontFamily: "var(--font-anton)", fontSize: "48px", letterSpacing: "-0.02em" }}
+              >PDH</text>
+            </svg>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+            <div className="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center h-16 px-6 gap-4">
+              {/* Left: Back to Hub */}
+              <div className="justify-self-start">
+                <button
+                  onClick={() => setLocation("/")}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-foreground/70 hover:text-foreground transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to Hub
+                </button>
+              </div>
+
+              {/* Centre: page label */}
+              <span className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground">
+                Profile &amp; Settings
+              </span>
+
+              {/* Right: countdown ring + name + sign out */}
+              <div className="justify-self-end flex items-center gap-3">
+                <div
+                  className="relative shrink-0 w-8 h-8"
+                  title={`Auto sign-out in ${secondsLeft}s`}
+                >
+                  <svg
+                    width="32" height="32"
+                    className="absolute inset-0"
+                    style={{ transform: "rotate(-90deg)" }}
+                    aria-hidden="true"
+                  >
+                    <circle cx="16" cy="16" r="14" fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="2" />
+                    <circle
+                      cx="16" cy="16" r="14" fill="none"
+                      stroke={ringColor} strokeWidth="2"
+                      strokeDasharray={ringCircumference}
+                      strokeDashoffset={ringCircumference * (1 - progress)}
+                      strokeLinecap="round"
+                      style={{ transition: "stroke-dashoffset 0.2s linear, stroke 0.4s ease" }}
+                    />
+                  </svg>
+                  <div className="absolute inset-[3px] rounded-full bg-primary/15 text-primary flex items-center justify-center">
+                    {isSuperAdmin ? <Crown className="w-3 h-3" /> : isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                  </div>
+                </div>
+                <span className="text-sm font-semibold text-foreground/80 hidden sm:block">{user?.name}</span>
+                <button
+                  onClick={() => logout().then(() => setLocation("/"))}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-foreground/70 hover:text-destructive transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign out</span>
+                </button>
+              </div>
+            </div>
+          </header>
+        </div>
+      </motion.div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-8 space-y-6">
         {/* Page title */}
         <div>
           <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-primary/8 text-primary px-3 py-1.5 rounded-full mb-3">
@@ -506,11 +602,6 @@ export default function Profile() {
           </Section>
         )}
 
-        <div className="flex justify-end pb-4">
-          <Button variant="outline" onClick={() => logout().then(() => setLocation("/"))} className="gap-2 text-sm">
-            Sign out
-          </Button>
-        </div>
       </div>
 
       {/* Delete Confirm Dialog */}
