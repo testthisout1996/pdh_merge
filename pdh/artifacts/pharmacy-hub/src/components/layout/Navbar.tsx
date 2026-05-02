@@ -37,6 +37,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { useAuth } from "@/context/AuthContext";
+import { useInactivityTimer } from "@/hooks/useInactivityTimer";
 
 export type ActiveSection = "hero" | "tools" | "faq" | "status" | "report";
 
@@ -131,6 +132,18 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
   const { user, logout, openLoginModal } = useAuth();
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
   const isSuperAdmin = user?.role === "superadmin";
+
+  const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
+    logout().then(() => setLocation("/"));
+  });
+
+  const ringCircumference = 2 * Math.PI * 14;
+  const ringColor =
+    progress > 0.25
+      ? "hsl(260,40%,40%)"
+      : progress > 0.083
+      ? "#f59e0b"
+      : "#ef4444";
 
   React.useEffect(() => {
     const container = scrollContainerRef?.current ?? null;
@@ -457,8 +470,37 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 px-3 h-16 rounded-none hover:bg-muted/40 transition-colors text-sm font-semibold text-foreground/80 hover:text-foreground focus:outline-none">
-                    <div className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[11px] font-bold uppercase shrink-0">
-                      {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                    <div
+                      className="relative shrink-0 w-8 h-8"
+                      title={`Auto sign-out in ${secondsLeft}s`}
+                    >
+                      <svg
+                        width="32"
+                        height="32"
+                        className="absolute inset-0"
+                        style={{ transform: "rotate(-90deg)" }}
+                        aria-hidden="true"
+                      >
+                        <circle
+                          cx="16" cy="16" r="14"
+                          fill="none"
+                          stroke="rgba(0,0,0,0.07)"
+                          strokeWidth="2"
+                        />
+                        <circle
+                          cx="16" cy="16" r="14"
+                          fill="none"
+                          stroke={ringColor}
+                          strokeWidth="2"
+                          strokeDasharray={ringCircumference}
+                          strokeDashoffset={ringCircumference * (1 - progress)}
+                          strokeLinecap="round"
+                          style={{ transition: "stroke-dashoffset 0.2s linear, stroke 0.4s ease" }}
+                        />
+                      </svg>
+                      <div className="absolute inset-[3px] rounded-full bg-primary/15 text-primary flex items-center justify-center">
+                        {isSuperAdmin ? <Crown className="w-3 h-3" /> : isAdmin ? <ShieldCheck className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                      </div>
                     </div>
                     <span className="max-w-[120px] truncate">{user.name}</span>
                     <ChevronDown className="w-3 h-3 opacity-50 shrink-0" />
