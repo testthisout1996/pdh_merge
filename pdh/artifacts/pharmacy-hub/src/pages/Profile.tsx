@@ -364,8 +364,33 @@ export default function Profile() {
             </svg>
 
             <div className="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center h-16 px-6 gap-4">
-              {/* Left: empty spacer — keeps the PDH logo visible */}
-              <div />
+              {/* Left: PDH hover-reveal (mirrors main Navbar Logo) */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setLocation("/")}
+                  className="relative flex items-center group shrink-0 text-left"
+                  aria-label="Pharmacy Dispensing Hub home"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="leading-none tracking-tight select-none invisible"
+                    style={{ fontFamily: "var(--font-anton)", fontSize: "48px" }}
+                  >
+                    PDH
+                  </span>
+                  <div
+                    className="absolute left-full top-0 bottom-0 flex items-stretch gap-2 pl-3 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out"
+                    aria-hidden="true"
+                  >
+                    <span className="w-px bg-foreground/70 self-stretch" />
+                    <span className="flex flex-col justify-center text-foreground text-[0.95rem] font-semibold leading-[1.15] tracking-tight whitespace-nowrap">
+                      <span>Pharmacy</span>
+                      <span>Dispensing Hub</span>
+                    </span>
+                  </div>
+                </button>
+              </div>
 
               {/* Centre: page label */}
               <span className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground">
@@ -419,32 +444,63 @@ export default function Profile() {
         </div>
       </motion.div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-8 space-y-6">
-        {/* Page title */}
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-primary/8 text-primary px-3 py-1.5 rounded-full mb-3">
-            {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
-            {isSuperAdmin ? "Super Administrator" : isAdmin ? "Administrator" : "Profile"}
-          </div>
-          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-serif)" }}>
-            Profile &amp; Settings
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage your account and {isAdmin ? "your team" : "PIN"} settings.</p>
+      {/* Hero section — matches PIL Search hero (531px) */}
+      <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
+        <img
+          src="/pharmacy-bg.jpg"
+          alt="Pharmacy setting"
+          className="absolute w-full object-cover object-center"
+          style={{ filter: "saturate(0.9)", height: "130%", top: "-15%", willChange: "transform" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2c1b3d]/85 via-[#2c1b3d]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2c1b3d]/50 via-transparent to-transparent" />
+
+        <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-10 pt-24 max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+            className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10"
+          >
+            {/* Left: badge + title + description */}
+            <div className="flex-1 min-w-0">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-white/15 text-white border border-white/25 px-3 py-1.5 rounded-full mb-3">
+                {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                {isSuperAdmin ? "Super Administrator" : isAdmin ? "Administrator" : "Profile"}
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
+                Profile &amp; Settings
+              </h1>
+              <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed">
+                Manage your account and {isAdmin ? "your team" : "PIN"} settings.
+              </p>
+            </div>
+
+            {/* Right: My Account card */}
+            <div className="shrink-0 bg-white/10 border border-white/20 rounded-md px-5 py-4 backdrop-blur-sm min-w-[220px]">
+              <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                <User className="w-3 h-3" /> My Account
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-full bg-white/20 text-white flex items-center justify-center text-base font-bold uppercase shrink-0 border border-white/30">
+                  {user?.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-white text-sm">{user?.name}</p>
+                  <div className="mt-1">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-white/70 bg-white/10 border border-white/20 rounded-full px-2 py-0.5">
+                      {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
+                      {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
+      </div>
 
-        {/* My account info */}
-        <Section icon={<User className="w-3.5 h-3.5" />} title="My Account">
-          <div className="flex items-center gap-4 p-4 rounded-md bg-muted/30 border border-border/40">
-            <div className="w-12 h-12 rounded-full bg-primary/15 text-primary flex items-center justify-center text-lg font-bold uppercase shrink-0">
-              {user?.name.charAt(0)}
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">{user?.name}</p>
-              <div className="mt-1">{user && roleBadge(user.role as Role)}</div>
-            </div>
-          </div>
-        </Section>
-
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-8 space-y-6">
         {/* Change my PIN */}
         <Section icon={<KeyRound className="w-3.5 h-3.5" />} title="Change My PIN">
           <form onSubmit={handleMyPin} className="space-y-3">
