@@ -14,6 +14,7 @@ import {
   Crown,
   User,
   Pencil,
+  Search,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -102,17 +103,22 @@ function PinInput({
 function Section({
   icon,
   title,
+  action,
   children,
 }: {
   icon: React.ReactNode;
   title: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-white border border-border/40 rounded-md p-6 shadow-sm">
-      <h2 className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground flex items-center gap-2 mb-5">
-        {icon} {title}
-      </h2>
+      <div className="flex items-center gap-3 mb-5">
+        <h2 className="text-[11px] font-bold tracking-widest uppercase text-muted-foreground flex items-center gap-2 shrink-0">
+          {icon} {title}
+        </h2>
+        {action && <div className="flex-1 min-w-0">{action}</div>}
+      </div>
       {children}
     </div>
   );
@@ -152,6 +158,8 @@ export default function Profile() {
   const [usernameValue, setUsernameValue] = React.useState("");
   const [usernameError, setUsernameError] = React.useState("");
   const [savingUsername, setSavingUsername] = React.useState(false);
+
+  const [staffSearch, setStaffSearch] = React.useState("");
 
   const [myPin, setMyPin] = React.useState("");
   const [myPinConfirm, setMyPinConfirm] = React.useState("");
@@ -284,9 +292,16 @@ export default function Profile() {
     else { setMyPinSuccess("Your PIN has been updated."); setMyPin(""); setMyPinConfirm(""); refresh(); }
   };
 
-  const staffMembers = isSuperAdmin
-    ? users.filter((u) => u.id !== user?.id)
-    : users.filter((u) => u.role !== "superadmin" && u.id !== user?.id);
+  const staffMembers = (
+    isSuperAdmin
+      ? users.filter((u) => u.id !== user?.id)
+      : users.filter((u) => u.role !== "superadmin" && u.id !== user?.id)
+  )
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .filter((u) =>
+      staffSearch.trim() === "" ||
+      u.name.toLowerCase().includes(staffSearch.trim().toLowerCase())
+    );
 
   return (
     <div className="min-h-screen bg-[hsl(270,20%,98%)]">
@@ -387,9 +402,28 @@ export default function Profile() {
 
         {/* Admin+: Staff members list */}
         {isAdmin && (
-          <Section icon={<Users className="w-3.5 h-3.5" />} title="Staff Members">
+          <Section
+            icon={<Users className="w-3.5 h-3.5" />}
+            title="Staff Members"
+            action={
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  value={staffSearch}
+                  onChange={(e) => setStaffSearch(e.target.value)}
+                  placeholder="Search by name…"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md border border-border bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors"
+                />
+              </div>
+            }
+          >
             <div className="flex items-center justify-between mb-4 -mt-1">
-              <span className="text-xs text-muted-foreground">{staffMembers.length} member{staffMembers.length !== 1 ? "s" : ""}</span>
+              <span className="text-xs text-muted-foreground">
+                {staffSearch.trim()
+                  ? `${staffMembers.length} result${staffMembers.length !== 1 ? "s" : ""}`
+                  : `${staffMembers.length} member${staffMembers.length !== 1 ? "s" : ""}`}
+              </span>
               <button onClick={fetchUsers} className="text-muted-foreground hover:text-foreground transition-colors" title="Refresh">
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
@@ -400,7 +434,9 @@ export default function Profile() {
                 <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               </div>
             ) : staffMembers.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-8">No other members yet.</p>
+              <p className="text-muted-foreground text-sm text-center py-8">
+                {staffSearch.trim() ? `No members match "${staffSearch}".` : "No other members yet."}
+              </p>
             ) : (
               <div className="divide-y divide-border/50">
                 {staffMembers.map((u) => {

@@ -25,6 +25,13 @@
     "name": "Maha Abdullahi",
     "username": "MAHA",
     "pin": "123456",
+    "role": "admin"
+  },
+  {
+    "id": "d83f7852-dc44-4f78-b89e-50bae8b63fd9",
+    "name": "Adam West",
+    "username": "ADAMW",
+    "pin": "1234",
     "role": "basic"
   }
 ]
