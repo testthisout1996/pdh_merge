@@ -5,6 +5,14 @@
     "username": "ADMIN",
     "pin": "230790",
     "role": "superadmin",
-    "lastLogin": "2026-05-02T15:12:15.451Z"
+    "lastLogin": "2026-05-02T17:37:14.183Z"
+  },
+  {
+    "id": "c0e95f62-b3ee-41bf-8909-aba5920b7e92",
+    "name": "John Smith",
+    "username": "JSMITH",
+    "pin": "1234",
+    "role": "basic",
+    "lastLogin": "2026-05-02T17:36:41.561Z"
   }
 ]

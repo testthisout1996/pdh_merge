@@ -25,7 +25,7 @@ router.post("/auth/login", (req, res) => {
   user.lastLogin = new Date().toISOString();
   saveUsers(users);
   req.session.userId = user.id;
-  res.json({ id: user.id, name: user.name, role: user.role, lastLogin: user.lastLogin });
+  res.json({ id: user.id, name: user.name, username: user.username, role: user.role, lastLogin: user.lastLogin });
 });
 
 router.post("/auth/logout", (req, res) => {
@@ -40,7 +40,7 @@ router.get("/auth/me", requireAuth, (req, res) => {
     res.status(401).json({ error: "User not found" });
     return;
   }
-  res.json({ id: user.id, name: user.name, role: user.role, lastLogin: user.lastLogin });
+  res.json({ id: user.id, name: user.name, username: user.username, role: user.role, lastLogin: user.lastLogin });
 });
 
 router.post("/auth/konami", (req, res) => {
@@ -53,7 +53,7 @@ router.post("/auth/konami", (req, res) => {
   superAdmin.lastLogin = new Date().toISOString();
   saveUsers(users);
   req.session.userId = superAdmin.id;
-  res.json({ id: superAdmin.id, name: superAdmin.name, role: superAdmin.role, lastLogin: superAdmin.lastLogin });
+  res.json({ id: superAdmin.id, name: superAdmin.name, username: superAdmin.username, role: superAdmin.role, lastLogin: superAdmin.lastLogin });
 });
 
 export default router;
