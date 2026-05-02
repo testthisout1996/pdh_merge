@@ -467,8 +467,6 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
           {/* Right Cluster */}
           <div className="hidden md:flex items-center gap-2 shrink-0 justify-self-end">
             {user ? (
-              <>
-                <div className="w-px h-12 bg-border" />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 px-3 h-16 rounded-none hover:bg-muted/40 transition-colors text-sm font-semibold text-foreground/80 hover:text-foreground focus:outline-none">
@@ -534,7 +532,6 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              </>
             ) : (
               <>
                 <div className="w-px h-12 bg-border" />
