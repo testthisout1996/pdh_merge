@@ -53,7 +53,7 @@ type ComponentKey =
   | "mhraSearch"
   | "mhraDocuments";
 
-type ToolKey = "pdhWebsite" | "pilTools" | "pilPrinter";
+type ToolKey = "pdhWebsite" | "pilTools";
 
 interface ToolDef {
   name: string;
@@ -62,7 +62,7 @@ interface ToolDef {
   components: ComponentKey[];
 }
 
-const TOOL_ORDER: ToolKey[] = ["pdhWebsite", "pilTools", "pilPrinter"];
+const TOOL_ORDER: ToolKey[] = ["pdhWebsite", "pilTools"];
 
 const TOOLS: Record<ToolKey, ToolDef> = {
   pdhWebsite: {
@@ -74,16 +74,9 @@ const TOOLS: Record<ToolKey, ToolDef> = {
   pilTools: {
     name: "PIL Tools",
     description:
-      "Patient Information Leaflet finder and the MHRA services it depends on.",
+      "PIL Printer and PIL Search — and the MHRA services they depend on.",
     icon: <Pill className="w-5 h-5" />,
     components: ["apiServer", "mhraSearch", "mhraDocuments"],
-  },
-  pilPrinter: {
-    name: "PIL Printer",
-    description:
-      "Medication leaflet merger — depends on the web frontend and MHRA document store.",
-    icon: <Printer className="w-5 h-5" />,
-    components: ["webFrontend", "mhraDocuments"],
   },
 };
 

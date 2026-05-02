@@ -389,11 +389,8 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                             <Printer className="w-4 h-4" />
                           </div>
                           <div className="flex-1">
-                            <div className="font-semibold text-sm text-foreground flex items-center gap-2">
+                            <div className="font-semibold text-sm text-foreground">
                               PIL Printer
-                              <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-sm">
-                                Coming Soon
-                              </span>
                             </div>
                             <div className="text-[11px] text-muted-foreground">
                               Batch print MDS leaflets
@@ -426,8 +423,11 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                       <Calculator className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-sm text-foreground">
+                      <div className="font-semibold text-sm text-foreground flex items-center gap-2">
                         Prednisolone Reducing Regimen Calculator
+                        <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-sm">
+                          Coming Soon
+                        </span>
                       </div>
                     </div>
                   </DropdownMenuItem>
@@ -609,11 +609,8 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                             <Printer className="w-4 h-4" />
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-semibold text-sm flex items-center gap-2">
+                            <span className="font-semibold text-sm">
                               PIL Printer
-                              <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-sm">
-                                Soon
-                              </span>
                             </span>
                             <span className="text-[10px] text-muted-foreground">
                               Batch print MDS leaflets
@@ -646,8 +643,11 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                           <div className="w-10 h-10 rounded-full bg-secondary/20 text-secondary-foreground flex items-center justify-center shrink-0">
                             <Calculator className="w-4 h-4" />
                           </div>
-                          <span className="font-semibold text-sm">
+                          <span className="font-semibold text-sm flex items-center gap-2">
                             Prednisolone Calculator
+                            <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-sm">
+                              Soon
+                            </span>
                           </span>
                         </Link>
                       </SheetClose>
