@@ -10,6 +10,7 @@ export interface User {
   username: string;
   pin: string;
   role: Role;
+  lastLogin?: string;
 }
 
 const DATA_DIR = path.join(process.cwd(), "data");

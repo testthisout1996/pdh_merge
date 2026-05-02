@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loadUsers } from "../lib/store";
+import { loadUsers, saveUsers } from "../lib/store";
 import { requireAuth } from "../middlewares/auth";
 
 const router = Router();
@@ -22,8 +22,10 @@ router.post("/auth/login", (req, res) => {
     res.status(401).json({ error: "Invalid username or PIN. Please try again." });
     return;
   }
+  user.lastLogin = new Date().toISOString();
+  saveUsers(users);
   req.session.userId = user.id;
-  res.json({ id: user.id, name: user.name, role: user.role });
+  res.json({ id: user.id, name: user.name, role: user.role, lastLogin: user.lastLogin });
 });
 
 router.post("/auth/logout", (req, res) => {
@@ -38,7 +40,7 @@ router.get("/auth/me", requireAuth, (req, res) => {
     res.status(401).json({ error: "User not found" });
     return;
   }
-  res.json({ id: user.id, name: user.name, role: user.role });
+  res.json({ id: user.id, name: user.name, role: user.role, lastLogin: user.lastLogin });
 });
 
 router.post("/auth/konami", (req, res) => {
@@ -48,8 +50,10 @@ router.post("/auth/konami", (req, res) => {
     res.status(404).json({ error: "Not found" });
     return;
   }
+  superAdmin.lastLogin = new Date().toISOString();
+  saveUsers(users);
   req.session.userId = superAdmin.id;
-  res.json({ id: superAdmin.id, name: superAdmin.name, role: superAdmin.role });
+  res.json({ id: superAdmin.id, name: superAdmin.name, role: superAdmin.role, lastLogin: superAdmin.lastLogin });
 });
 
 export default router;

@@ -591,18 +591,55 @@ export default function Profile() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 My Account
               </p>
-              {/* Avatar + name + role row */}
-              <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
-                  {user?.name.charAt(0)}
+
+              {/* Two-column: left = identity, right = permissions */}
+              <div className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-0">
+                {/* LEFT — avatar + name + role */}
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
+                    {user?.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0 pt-0.5">
+                    <p className="font-semibold text-foreground text-sm truncate">{user?.name}</p>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+                        {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
+                        {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground text-sm truncate">{user?.name}</p>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
-                      {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
-                      {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
-                    </span>
+
+                {/* RIGHT — permissions */}
+                <div className="flex flex-col gap-1.5 border-l border-border/30 pl-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Permissions
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(isSuperAdmin ? [
+                      "Full system access",
+                      "Manage all users",
+                      "Reset all PINs",
+                      "Assign roles",
+                      "Add / remove users",
+                      "PIL Search",
+                    ] : isAdmin ? [
+                      "Manage basic users",
+                      "Reset basic PINs",
+                      "Add basic users",
+                      "PIL Search",
+                    ] : [
+                      "Change own PIN",
+                      "PIL Printer",
+                      "Prednisolone Calc",
+                    ]).map((perm) => (
+                      <span
+                        key={perm}
+                        className="inline-flex items-center text-[10px] font-semibold tracking-wide text-foreground/70 bg-muted/60 border border-border/50 rounded-md px-2 py-0.5 whitespace-nowrap"
+                      >
+                        {perm}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -610,37 +647,19 @@ export default function Profile() {
               {/* Faint divider */}
               <div className="border-t border-border/40 -mx-5" />
 
-              {/* Permissions section */}
-              <div className="flex flex-col gap-2">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Permissions
+              {/* Last login */}
+              <div className="flex items-center gap-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground shrink-0">
+                  Last login
                 </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {(isSuperAdmin ? [
-                    "Full system access",
-                    "Manage all users",
-                    "Reset all PINs",
-                    "Assign roles",
-                    "Add / remove users",
-                    "PIL Search",
-                  ] : isAdmin ? [
-                    "Manage basic users",
-                    "Reset basic PINs",
-                    "Add basic users",
-                    "PIL Search",
-                  ] : [
-                    "Change own PIN",
-                    "PIL Printer",
-                    "Prednisolone Calc",
-                  ]).map((perm) => (
-                    <span
-                      key={perm}
-                      className="inline-flex items-center text-[10px] font-semibold tracking-wide text-foreground/70 bg-muted/60 border border-border/50 rounded-md px-2 py-0.5 whitespace-nowrap"
-                    >
-                      {perm}
-                    </span>
-                  ))}
-                </div>
+                <span className="text-[10px] text-foreground/60 font-medium">
+                  {user?.lastLogin
+                    ? new Date(user.lastLogin).toLocaleString(undefined, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })
+                    : "This session"}
+                </span>
               </div>
             </div>
 
