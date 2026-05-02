@@ -27,7 +27,7 @@ export function useInactivityTimer(
       firedRef.current = false;
     };
 
-    const events = ["click", "mousemove", "keydown", "touchstart", "wheel"] as const;
+    const events = ["click", "keydown", "touchstart"] as const;
     events.forEach((e) => window.addEventListener(e, handleActivity, { passive: true }));
 
     const interval = setInterval(() => {
