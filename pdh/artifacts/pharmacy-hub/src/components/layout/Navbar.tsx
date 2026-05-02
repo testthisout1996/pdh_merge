@@ -442,11 +442,11 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
           </nav>
 
           {/* Right Cluster */}
-          <div className="hidden md:flex items-center gap-2 shrink-0 justify-self-end">
+          <div className="hidden md:flex items-center gap-2 shrink-0 justify-self-end self-stretch">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-muted/60 transition-colors text-sm font-semibold text-foreground/80 hover:text-foreground focus:outline-none">
+                  <button className="flex items-center gap-2 px-3 py-5 rounded-none hover:bg-muted/40 transition-colors text-sm font-semibold text-foreground/80 hover:text-foreground focus:outline-none self-stretch">
                     <div className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[11px] font-bold uppercase shrink-0">
                       {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                     </div>
