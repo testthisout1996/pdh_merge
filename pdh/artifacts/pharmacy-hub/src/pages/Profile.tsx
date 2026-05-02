@@ -603,7 +603,7 @@ export default function Profile() {
             {/* Card + buttons: card width is capped imperatively to the measured buttons row width */}
             <div className="flex flex-col gap-5">
             {/* My Account card — white background */}
-            <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3" style={cardMaxW ? { maxWidth: cardMaxW } : undefined}>
+            <div className="bg-white/80 rounded-md px-5 py-4 shadow-lg flex flex-col gap-3" style={cardMaxW ? { maxWidth: cardMaxW } : undefined}>
 
               {/* Two-column: left = MY ACCOUNT label + identity, right = PERMISSIONS label + chips */}
               <div className="flex items-start gap-5">
