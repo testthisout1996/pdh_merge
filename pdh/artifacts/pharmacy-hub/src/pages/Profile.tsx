@@ -461,41 +461,65 @@ export default function Profile() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-            className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10"
+            className="flex flex-col gap-5 max-w-lg"
           >
-            {/* Left: badge + title + description */}
-            <div className="flex-1 min-w-0">
+            {/* Role badge + title + description */}
+            <div>
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-white/15 text-white border border-white/25 px-3 py-1.5 rounded-full mb-3">
                 {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                 {isSuperAdmin ? "Super Administrator" : isAdmin ? "Administrator" : "Profile"}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-3 tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-2 tracking-tight">
                 Profile &amp; Settings
               </h1>
-              <p className="text-white/80 text-sm md:text-base max-w-xl leading-relaxed">
+              <p className="text-white/80 text-sm md:text-base leading-relaxed">
                 Manage your account and {isAdmin ? "your team" : "PIN"} settings.
               </p>
             </div>
 
-            {/* Right: My Account card */}
-            <div className="shrink-0 bg-white/10 border border-white/20 rounded-md px-5 py-4 backdrop-blur-sm min-w-[220px]">
-              <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                <User className="w-3 h-3" /> My Account
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-white/20 text-white flex items-center justify-center text-base font-bold uppercase shrink-0 border border-white/30">
-                  {user?.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-semibold text-white text-sm">{user?.name}</p>
-                  <div className="mt-1">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-white/70 bg-white/10 border border-white/20 rounded-full px-2 py-0.5">
-                      {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
-                      {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
-                    </span>
-                  </div>
+            {/* My Account card — white background */}
+            <div className="bg-white rounded-md px-5 py-4 shadow-lg flex items-center gap-4">
+              <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
+                {user?.name.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground text-sm truncate">{user?.name}</p>
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+                    {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
+                    {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
+                  </span>
                 </div>
               </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground shrink-0">
+                My Account
+              </p>
+            </div>
+
+            {/* Role-gated quick-jump buttons */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <a
+                href="#section-pin"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
+              >
+                <KeyRound className="w-4 h-4" /> Change PIN
+              </a>
+              {isAdmin && (
+                <a
+                  href="#section-add-user"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
+                >
+                  <Plus className="w-4 h-4" /> Add User
+                </a>
+              )}
+              {isAdmin && (
+                <a
+                  href="#section-staff"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
+                >
+                  <Users className="w-4 h-4" /> Staff Members
+                </a>
+              )}
             </div>
           </motion.div>
         </div>
@@ -503,6 +527,7 @@ export default function Profile() {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-8 space-y-6">
         {/* Change my PIN */}
+        <div id="section-pin">
         <Section icon={<KeyRound className="w-3.5 h-3.5" />} title="Change My PIN">
           <form onSubmit={handleMyPin} className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -517,9 +542,11 @@ export default function Profile() {
             </Button>
           </form>
         </Section>
+        </div>
 
         {/* Admin+: Add new user */}
         {isAdmin && (
+          <div id="section-add-user">
           <Section icon={<Plus className="w-3.5 h-3.5" />} title="Add New User">
             <form onSubmit={handleAdd} className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
@@ -551,10 +578,12 @@ export default function Profile() {
             {addError && <p className="text-destructive text-xs mt-2">{addError}</p>}
             {addSuccess && <p className="text-emerald-600 text-xs mt-2 font-medium">{addSuccess}</p>}
           </Section>
+          </div>
         )}
 
         {/* Admin+: Staff members list */}
         {isAdmin && (
+          <div id="section-staff">
           <Section
             icon={<Users className="w-3.5 h-3.5" />}
             title="Staff Members"
@@ -657,6 +686,7 @@ export default function Profile() {
               </div>
             )}
           </Section>
+          </div>
         )}
 
       </div>
