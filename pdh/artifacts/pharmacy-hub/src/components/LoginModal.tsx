@@ -63,7 +63,7 @@ export function LoginModal() {
     }
   }, [user, loginModalOpen, postLoginPath, closeLoginModal, setLocation]);
 
-  const canClose = !postLoginPath;
+  const canClose = true;
 
   return (
     <AnimatePresence>

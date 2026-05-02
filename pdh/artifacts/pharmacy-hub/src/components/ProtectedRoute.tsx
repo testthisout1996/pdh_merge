@@ -26,7 +26,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   }
 
   if (!user) {
-    return null;
+    return <Redirect to="/" />;
   }
 
   if (requiredRole) {
