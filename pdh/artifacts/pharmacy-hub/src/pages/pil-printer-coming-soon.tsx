@@ -1,42 +1,12 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Printer, ArrowLeft, Search, CheckCircle2, Clock, ShieldOff } from "lucide-react";
+import { Printer, ArrowLeft, Search, CheckCircle2, Clock } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useSettings } from "@/context/SettingsContext";
-import { useAuth } from "@/context/AuthContext";
 
 export default function PilPrinterComingSoon() {
-  const { settings } = useSettings();
-  const { user } = useAuth();
-  const isDisabled = settings.disabledFeatures.includes("pil-printer") && user?.role !== "superadmin";
-
-  if (isDisabled) {
-    return (
-      <div className="min-h-[100dvh] flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center px-4">
-          <div className="text-center max-w-sm">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-md bg-destructive/10 text-destructive mb-4">
-              <ShieldOff className="w-8 h-8" />
-            </div>
-            <h2 className="text-xl font-bold mb-2">Access Disabled</h2>
-            <p className="text-muted-foreground text-sm mb-4">
-              PIL Printer has been temporarily disabled by your administrator.
-            </p>
-            <Link href="/">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
-              </Button>
-            </Link>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
       <Navbar />

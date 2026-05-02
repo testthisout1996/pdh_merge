@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -13,8 +12,6 @@ import {
   AlertCircle,
   RefreshCw,
   Tag,
-  ShieldOff,
-  ArrowLeft,
 } from "lucide-react";
 import {
   useSearchMhraPil,
@@ -35,8 +32,6 @@ import {
   classifyPilResult,
 } from "@/lib/pilUtils";
 import heroImage from "@assets/pil-hero.webp";
-import { useSettings } from "@/context/SettingsContext";
-import { useAuth } from "@/context/AuthContext";
 
 const PAGE_SIZE = 10;
 
@@ -503,10 +498,6 @@ const HERO_H = 531;    // hero section height (425 × 1.25)
 const BLUR_MAX = 10;   // max blur radius (px) applied to the overlay
 
 export default function PilSearch() {
-  const { settings } = useSettings();
-  const { user } = useAuth();
-  const isDisabled = settings.disabledFeatures.includes("pil-search") && user?.role !== "superadmin";
-
   const [activeTab, setActiveTab] = React.useState("search");
 
   const pageRef = React.useRef<HTMLDivElement>(null);
@@ -595,30 +586,6 @@ export default function PilSearch() {
     page.addEventListener("scroll", onScroll, { passive: true });
     return () => page.removeEventListener("scroll", onScroll);
   }, []);
-
-  if (isDisabled) {
-    return (
-      <div className="min-h-[100dvh] flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center px-4">
-          <div className="text-center max-w-sm">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-md bg-destructive/10 text-destructive mb-4">
-              <ShieldOff className="w-8 h-8" />
-            </div>
-            <h2 className="text-xl font-bold mb-2">Access Disabled</h2>
-            <p className="text-muted-foreground text-sm mb-4">
-              PIL Search has been temporarily disabled by your administrator.
-            </p>
-            <Link href="/">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
-              </Button>
-            </Link>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div

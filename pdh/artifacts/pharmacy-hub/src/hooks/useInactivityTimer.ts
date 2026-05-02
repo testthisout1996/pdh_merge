@@ -1,12 +1,13 @@
 import * as React from "react";
 
+const TIMEOUT_MS = 60_000;
+
 export function useInactivityTimer(
   active: boolean,
-  onTimeout: () => void,
-  timeoutMs: number = 60_000
+  onTimeout: () => void
 ): { progress: number; secondsLeft: number } {
   const [progress, setProgress] = React.useState(1);
-  const deadlineRef = React.useRef(Date.now() + timeoutMs);
+  const deadlineRef = React.useRef(Date.now() + TIMEOUT_MS);
   const firedRef = React.useRef(false);
   const onTimeoutRef = React.useRef(onTimeout);
   onTimeoutRef.current = onTimeout;
@@ -18,11 +19,11 @@ export function useInactivityTimer(
       return;
     }
 
-    deadlineRef.current = Date.now() + timeoutMs;
+    deadlineRef.current = Date.now() + TIMEOUT_MS;
     firedRef.current = false;
 
     const handleActivity = () => {
-      deadlineRef.current = Date.now() + timeoutMs;
+      deadlineRef.current = Date.now() + TIMEOUT_MS;
       firedRef.current = false;
     };
 
@@ -31,7 +32,7 @@ export function useInactivityTimer(
 
     const interval = setInterval(() => {
       const remaining = deadlineRef.current - Date.now();
-      const p = Math.max(0, Math.min(1, remaining / timeoutMs));
+      const p = Math.max(0, Math.min(1, remaining / TIMEOUT_MS));
       setProgress(p);
       if (remaining <= 0 && !firedRef.current) {
         firedRef.current = true;
@@ -43,7 +44,7 @@ export function useInactivityTimer(
       events.forEach((e) => window.removeEventListener(e, handleActivity));
       clearInterval(interval);
     };
-  }, [active, timeoutMs]);
+  }, [active]);
 
-  return { progress, secondsLeft: Math.ceil(progress * (timeoutMs / 1000)) };
+  return { progress, secondsLeft: Math.ceil(progress * (TIMEOUT_MS / 1000)) };
 }
