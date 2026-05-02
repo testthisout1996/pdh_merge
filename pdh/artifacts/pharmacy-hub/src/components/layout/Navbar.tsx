@@ -533,14 +533,17 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs gap-1.5"
-                onClick={() => openLoginModal()}
-              >
-                Sign in
-              </Button>
+              <>
+                <div className="w-px h-5 bg-border/50" />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs gap-1.5"
+                  onClick={() => openLoginModal()}
+                >
+                  Sign in
+                </Button>
+              </>
             )}
           </div>
 
