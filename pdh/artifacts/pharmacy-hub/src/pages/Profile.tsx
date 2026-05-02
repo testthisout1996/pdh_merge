@@ -595,9 +595,9 @@ export default function Profile() {
               </p>
 
               {/* Two-column: left = identity, right = permissions */}
-              <div className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-0">
+              <div className="flex items-start gap-5">
                 {/* LEFT — avatar + name + role */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 shrink-0">
                   <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
                     {user?.name.charAt(0)}
                   </div>
@@ -613,7 +613,7 @@ export default function Profile() {
                 </div>
 
                 {/* RIGHT — permissions */}
-                <div className="flex flex-col gap-1.5 border-l border-border/30 pl-5">
+                <div className="flex flex-col gap-1.5 border-l border-border/30 pl-5 flex-1 min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                     Permissions
                   </p>
@@ -665,10 +665,8 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Quick-jump buttons — all 3 always rendered so the row width is fixed.
-                Admin-only buttons are invisible (not hidden) for basic users so they
-                still occupy space and the card above locks to the same width. */}
-            <div className="flex items-center gap-2">
+            {/* Role-gated quick-jump buttons — w-fit so the div hugs the buttons exactly */}
+            <div className="flex items-center gap-2 w-fit">
               <button
                 type="button"
                 onClick={() => scrollToSection(pinSectionRef)}
@@ -676,22 +674,24 @@ export default function Profile() {
               >
                 <KeyRound className="w-4 h-4" /> Change PIN
               </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection(addUserSectionRef)}
-                aria-hidden={!isAdmin}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200 ${!isAdmin ? "invisible pointer-events-none" : ""}`}
-              >
-                <Plus className="w-4 h-4" /> Add User
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection(staffSectionRef)}
-                aria-hidden={!isAdmin}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200 ${!isAdmin ? "invisible pointer-events-none" : ""}`}
-              >
-                <Users className="w-4 h-4" /> Staff Members
-              </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(addUserSectionRef)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
+                >
+                  <Plus className="w-4 h-4" /> Add User
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(staffSectionRef)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
+                >
+                  <Users className="w-4 h-4" /> Staff Members
+                </button>
+              )}
             </div>
             </div>{/* end w-fit card+buttons wrapper */}
           </motion.div>
