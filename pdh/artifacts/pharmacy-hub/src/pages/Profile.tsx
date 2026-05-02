@@ -137,11 +137,17 @@ export default function Profile() {
   const [scrolled, setScrolled] = React.useState(false);
   const reactId = React.useId();
   const navbarMaskId = `profile-navbar-mask-${reactId.replace(/[:]/g, "")}`;
+  const badgeSentinelRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const sentinel = badgeSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setScrolled(!entry.isIntersecting),
+      { rootMargin: "-64px 0px 0px 0px", threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
@@ -465,6 +471,8 @@ export default function Profile() {
           >
             {/* Role badge + title + description */}
             <div>
+              {/* Sentinel: navbar locks when this hits the top of the viewport */}
+              <div ref={badgeSentinelRef} className="h-px w-full" aria-hidden="true" />
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-white/15 text-white border border-white/25 px-3 py-1.5 rounded-full mb-3">
                 {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                 {isSuperAdmin ? "Super Administrator" : isAdmin ? "Administrator" : "Profile"}
