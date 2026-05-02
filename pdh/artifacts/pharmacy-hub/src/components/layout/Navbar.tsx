@@ -155,6 +155,16 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
     }
   }, [scrollContainerRef]);
 
+  React.useEffect(() => {
+    setShowScrollTop(false);
+    const container = scrollContainerRef?.current ?? null;
+    if (container) {
+      container.scrollTo({ top: 0 });
+    } else {
+      window.scrollTo({ top: 0 });
+    }
+  }, [location, scrollContainerRef]);
+
   const handleScrollTop = React.useCallback(() => {
     const container = scrollContainerRef?.current ?? null;
     if (container) {
@@ -457,6 +467,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                 <DropdownMenuContent
                   align="end"
                   sideOffset={scrolled ? 5 : 9}
+                  alignOffset={scrolled ? 0 : -24}
                   className="w-52 rounded-md p-1.5 shadow-xl border border-border/50 bg-white"
                 >
                   <div className="px-2.5 py-2 mb-1 border-b border-border/50">
