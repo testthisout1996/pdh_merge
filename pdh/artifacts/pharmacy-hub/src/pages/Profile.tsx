@@ -393,7 +393,7 @@ export default function Profile() {
     );
 
   return (
-    <div ref={pageRef} className="h-[100dvh] overflow-y-auto bg-[hsl(270,20%,98%)] selection:bg-primary/20">
+    <div ref={pageRef} className="h-[100dvh] overflow-y-auto bg-[#2c1b3d] selection:bg-primary/20">
       {/* Custom Profile navbar — same floating→full-width widen as main site (scrollTop > 20) */}
       <motion.div
         initial={{ y: -80, opacity: 0 }}
@@ -557,30 +557,32 @@ export default function Profile() {
             <div className="flex flex-col gap-5">
             {/* My Account card — white background */}
             <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3" style={cardMaxW ? { maxWidth: cardMaxW } : undefined}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                My Account
-              </p>
 
-              {/* Two-column: left = identity, right = permissions */}
+              {/* Two-column: left = MY ACCOUNT label + identity, right = PERMISSIONS label + chips */}
               <div className="flex items-start gap-5">
-                {/* LEFT — avatar + name + role */}
-                <div className="flex items-start gap-3 shrink-0">
-                  <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
-                    {user?.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0 pt-0.5">
-                    <p className="font-semibold text-foreground text-sm truncate">{user?.name}</p>
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
-                        {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
-                        {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
-                      </span>
+                {/* LEFT — MY ACCOUNT label + avatar + name + role */}
+                <div className="flex flex-col gap-2 shrink-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    My Account
+                  </p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
+                      {user?.name.charAt(0)}
+                    </div>
+                    <div className="min-w-0 pt-0.5">
+                      <p className="font-semibold text-foreground text-sm truncate">{user?.name}</p>
+                      <div className="mt-1 flex items-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+                          {isSuperAdmin ? <Crown className="w-2.5 h-2.5" /> : isAdmin ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCog className="w-2.5 h-2.5" />}
+                          {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* RIGHT — permissions */}
-                <div className="flex flex-col gap-1.5 border-l border-border/30 pl-5 flex-1 min-w-0">
+                {/* RIGHT — PERMISSIONS label + chips */}
+                <div className="flex flex-col gap-2 border-l border-border/30 pl-5 flex-1 min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                     Permissions
                   </p>
@@ -665,6 +667,7 @@ export default function Profile() {
         </div>
       </div>
 
+      <div className="bg-[hsl(270,20%,98%)]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-8 space-y-6">
         {/* Change my PIN */}
         <div ref={pinSectionRef}>
@@ -830,6 +833,7 @@ export default function Profile() {
         )}
 
       </div>
+      </div>{/* end bg-[hsl(270,20%,98%)] wrapper */}
 
       {/* Delete Confirm Dialog */}
       <Dialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
