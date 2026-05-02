@@ -139,25 +139,21 @@ export default function Profile() {
   const reactId = React.useId();
   const navbarMaskId = `profile-navbar-mask-${reactId.replace(/[:]/g, "")}`;
 
-  // PIL-Search-style scroll system
+  // Scroll system — parallax + blur only (no hero locking)
   const NAVBAR_TOP_GAP = 16;
   const NAVBAR_BAR_H  = 64;
   const NAVBAR_BOTTOM = NAVBAR_TOP_GAP + NAVBAR_BAR_H; // 80px
-  const GAP           = 4;
-  const LOCK_TARGET_Y = NAVBAR_BOTTOM + GAP;           // 84px
   const HERO_H        = 531;
   const BLUR_MAX      = 10;
   const PARALLAX      = 0.2;
 
-  const pageRef          = React.useRef<HTMLDivElement>(null);
-  const heroWrapperRef   = React.useRef<HTMLDivElement>(null);
-  const spacerRef        = React.useRef<HTMLDivElement>(null);
-  const blurLayerRef     = React.useRef<HTMLDivElement>(null);
-  const heroImgRef       = React.useRef<HTMLImageElement>(null);
-  const badgeSentinelRef = React.useRef<HTMLDivElement>(null);
-  const lockAtRef        = React.useRef<number>(0);
-  const heroFixedTopRef  = React.useRef<number>(0);
-  const isLockedRef      = React.useRef<boolean>(false);
+  const pageRef      = React.useRef<HTMLDivElement>(null);
+  const blurLayerRef = React.useRef<HTMLDivElement>(null);
+  const heroImgRef   = React.useRef<HTMLImageElement>(null);
+
+  // Card width — measured imperatively from the buttons row
+  const buttonsRowRef                     = React.useRef<HTMLDivElement>(null);
+  const [cardMaxW, setCardMaxW]           = React.useState<number | undefined>(undefined);
 
   // Section refs for smooth-scroll buttons
   const pinSectionRef      = React.useRef<HTMLDivElement>(null);
@@ -176,61 +172,36 @@ export default function Profile() {
     page.scrollTo({ top: target, behavior: "smooth" });
   }, []);
 
+  // Measure buttons row width once mounted (and on resize) → cap card to that width
+  React.useLayoutEffect(() => {
+    const measure = () => {
+      const w = buttonsRowRef.current?.offsetWidth;
+      if (w) setCardMaxW(w);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
   React.useEffect(() => {
-    const page    = pageRef.current;
-    const heroEl  = heroWrapperRef.current;
-    const spacerEl = spacerRef.current;
-    if (!page || !heroEl || !spacerEl) return;
+    const page = pageRef.current;
+    if (!page) return;
 
     const onScroll = () => {
       const scrollTop = page.scrollTop;
-      const sentinelEl = badgeSentinelRef.current;
-      const imgEl      = heroImgRef.current;
+      const imgEl     = heroImgRef.current;
+      const blurEl    = blurLayerRef.current;
 
-      // Recalculate lock threshold every frame while unlocked (sentinel-based, not buttons-based)
-      if (!isLockedRef.current && sentinelEl) {
-        const rect      = sentinelEl.getBoundingClientRect();
-        const domY      = rect.top + scrollTop;
-        lockAtRef.current      = Math.max(0, domY - LOCK_TARGET_Y);
-        heroFixedTopRef.current = -lockAtRef.current;
-      }
+      // Parallax on hero image
+      if (imgEl) imgEl.style.transform = `translateY(${scrollTop * PARALLAX}px)`;
 
-      const shouldLock = lockAtRef.current > 0 && scrollTop >= lockAtRef.current;
-
-      // Parallax — freeze at lockAt when locked
-      if (imgEl) {
-        const shift = Math.min(scrollTop, lockAtRef.current > 0 ? lockAtRef.current : scrollTop);
-        imgEl.style.transform = `translateY(${shift * PARALLAX}px)`;
-      }
-
-      // Blur overlay ramps 0 → BLUR_MAX as scroll approaches lockAt
-      const blurEl = blurLayerRef.current;
+      // Blur overlay ramps 0 → BLUR_MAX over the first half of the hero
       if (blurEl) {
-        const p      = lockAtRef.current > 0 ? Math.min(1, scrollTop / lockAtRef.current) : 0;
+        const p      = Math.min(1, scrollTop / (HERO_H * 0.5));
         const blurPx = (p * BLUR_MAX).toFixed(2);
         blurEl.style.backdropFilter = `blur(${blurPx}px)`;
         (blurEl.style as CSSStyleDeclaration & { webkitBackdropFilter: string }).webkitBackdropFilter = `blur(${blurPx}px)`;
         blurEl.style.opacity = String(p);
-      }
-
-      // Lock / unlock the hero imperatively (same-frame DOM write to avoid jitter)
-      if (shouldLock !== isLockedRef.current) {
-        isLockedRef.current = shouldLock;
-        if (shouldLock) {
-          heroEl.style.position = "fixed";
-          heroEl.style.top      = `${heroFixedTopRef.current}px`;
-          heroEl.style.left     = "0";
-          heroEl.style.right    = "0";
-          heroEl.style.zIndex   = "30";
-          spacerEl.style.height = `${HERO_H}px`;
-        } else {
-          heroEl.style.position = "";
-          heroEl.style.top      = "";
-          heroEl.style.left     = "";
-          heroEl.style.right    = "";
-          heroEl.style.zIndex   = "";
-          spacerEl.style.height = "0px";
-        }
       }
 
       // Navbar widen — same threshold as the main site Navbar
@@ -549,8 +520,6 @@ export default function Profile() {
         } as React.CSSProperties}
       />
 
-      {/* Hero wrapper — locked to fixed imperatively by the scroll handler */}
-      <div ref={heroWrapperRef}>
       {/* Hero section — matches PIL Search hero (531px) */}
       <div className="relative w-full overflow-hidden" style={{ height: "531px" }}>
         <img
@@ -572,8 +541,6 @@ export default function Profile() {
           >
             {/* Role badge + title + description */}
             <div>
-              {/* Sentinel: navbar locks when this hits the top of the viewport */}
-              <div ref={badgeSentinelRef} className="h-px w-full" aria-hidden="true" />
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-white/15 text-white border border-white/25 px-3 py-1.5 rounded-full mb-3">
                 {isSuperAdmin ? <Crown className="w-3.5 h-3.5" /> : isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                 {isSuperAdmin ? "Super Administrator" : isAdmin ? "Administrator" : "Profile"}
@@ -586,10 +553,10 @@ export default function Profile() {
               </p>
             </div>
 
-            {/* Card + buttons share a w-fit wrapper so card width = buttons row width */}
-            <div className="w-fit max-w-full flex flex-col gap-5">
+            {/* Card + buttons: card width is capped imperatively to the measured buttons row width */}
+            <div className="flex flex-col gap-5">
             {/* My Account card — white background */}
-            <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3">
+            <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3" style={cardMaxW ? { maxWidth: cardMaxW } : undefined}>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 My Account
               </p>
@@ -665,8 +632,8 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Role-gated quick-jump buttons — w-fit so the div hugs the buttons exactly */}
-            <div className="flex items-center gap-2 w-fit">
+            {/* Role-gated quick-jump buttons */}
+            <div ref={buttonsRowRef} className="flex items-center gap-2 w-fit">
               <button
                 type="button"
                 onClick={() => scrollToSection(pinSectionRef)}
@@ -697,10 +664,6 @@ export default function Profile() {
           </motion.div>
         </div>
       </div>
-      </div>{/* end heroWrapperRef */}
-
-      {/* Spacer — height driven imperatively so it updates in the same frame as the hero lock */}
-      <div ref={spacerRef} style={{ height: 0 }} />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-8 space-y-6">
         {/* Change my PIN */}
