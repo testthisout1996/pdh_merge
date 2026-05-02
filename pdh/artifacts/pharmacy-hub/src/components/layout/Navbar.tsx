@@ -454,21 +454,25 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                     <ChevronDown className="w-3 h-3 opacity-50 shrink-0" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <div className="px-3 py-2 border-b border-border/50">
+                <DropdownMenuContent
+                  align="end"
+                  sideOffset={scrolled ? 8 : 12}
+                  className="w-52 rounded-md p-1.5 shadow-xl border border-border/50 bg-white"
+                >
+                  <div className="px-2.5 py-2 mb-1 border-b border-border/50">
                     <p className="font-semibold text-sm text-foreground truncate">{user.name}</p>
                     <p className="text-xs text-muted-foreground capitalize">{user.role === "superadmin" ? "Super Admin" : user.role}</p>
                   </div>
                   <Link href="/profile">
-                    <DropdownMenuItem className="gap-2 cursor-pointer mt-1">
-                      <User className="w-4 h-4" />
+                    <DropdownMenuItem className="rounded-md gap-2 cursor-pointer px-2.5 py-2 mt-0.5 text-sm focus:bg-primary/5 transition-colors">
+                      <User className="w-4 h-4 text-primary/70" />
                       Profile &amp; Settings
                     </DropdownMenuItem>
                   </Link>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem
                     onClick={() => logout().then(() => setLocation("/"))}
-                    className="gap-2 text-destructive focus:text-destructive cursor-pointer"
+                    className="rounded-md gap-2 cursor-pointer px-2.5 py-2 text-sm text-destructive focus:text-destructive focus:bg-destructive/5 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign out
