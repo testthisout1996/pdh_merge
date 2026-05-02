@@ -568,7 +568,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-            className="flex flex-col gap-5 max-w-lg"
+            className="flex flex-col gap-5 w-fit max-w-full"
           >
             {/* Role badge + title + description */}
             <div>
@@ -587,10 +587,11 @@ export default function Profile() {
             </div>
 
             {/* My Account card — white background */}
-            <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-2.5">
+            <div className="bg-white rounded-md px-5 py-4 shadow-lg flex flex-col gap-3">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 My Account
               </p>
+              {/* Avatar + name + role row */}
               <div className="flex items-center gap-4">
                 <div className="w-11 h-11 rounded-full bg-primary/15 text-primary flex items-center justify-center text-base font-bold uppercase shrink-0">
                   {user?.name.charAt(0)}
@@ -603,6 +604,42 @@ export default function Profile() {
                       {isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Basic"}
                     </span>
                   </div>
+                </div>
+              </div>
+
+              {/* Faint divider */}
+              <div className="border-t border-border/40 -mx-5" />
+
+              {/* Permissions section */}
+              <div className="flex flex-col gap-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Permissions
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {(isSuperAdmin ? [
+                    "Full system access",
+                    "Manage all users",
+                    "Reset all PINs",
+                    "Assign roles",
+                    "Add / remove users",
+                    "PIL Search",
+                  ] : isAdmin ? [
+                    "Manage basic users",
+                    "Reset basic PINs",
+                    "Add basic users",
+                    "PIL Search",
+                  ] : [
+                    "Change own PIN",
+                    "PIL Printer",
+                    "Prednisolone Calc",
+                  ]).map((perm) => (
+                    <span
+                      key={perm}
+                      className="inline-flex items-center text-[10px] font-semibold tracking-wide text-foreground/70 bg-muted/60 border border-border/50 rounded-md px-2 py-0.5 whitespace-nowrap"
+                    >
+                      {perm}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
