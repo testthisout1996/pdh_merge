@@ -51,9 +51,21 @@ function Router() {
         )}
       </Route>
 
-      {/* PIL Printer — public */}
-      <Route path="/tools/pils/pil-printer" component={PilPrinter} />
-      <Route path="/tools/pil-printer" component={PilPrinter} />
+      {/* PIL Printer — any authenticated user */}
+      <Route path="/tools/pils/pil-printer">
+        {() => (
+          <ProtectedRoute>
+            <PilPrinter />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/tools/pil-printer">
+        {() => (
+          <ProtectedRoute>
+            <PilPrinter />
+          </ProtectedRoute>
+        )}
+      </Route>
 
       {/* Prednisolone Calculator coming soon — public */}
       <Route path="/tools/prednisolone-calculator" component={PrednisoloneCalculatorComingSoon} />
