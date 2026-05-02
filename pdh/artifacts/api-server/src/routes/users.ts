@@ -7,13 +7,17 @@ const router = Router();
 
 router.get("/users", requireRole("admin", "superadmin"), (req, res) => {
   const users = loadUsers();
-  res.json(users.map((u) => ({ id: u.id, name: u.name, role: u.role })));
+  res.json(users.map((u) => ({ id: u.id, name: u.name, username: u.username, role: u.role })));
 });
 
 router.post("/users", requireRole("admin", "superadmin"), (req, res) => {
-  const { name, pin } = req.body as { name?: string; pin?: string };
-  if (!name || !pin) {
-    res.status(400).json({ error: "Name and PIN are required" });
+  const { name, username, pin } = req.body as { name?: string; username?: string; pin?: string };
+  if (!name || !username || !pin) {
+    res.status(400).json({ error: "Name, username and PIN are required" });
+    return;
+  }
+  if (!/^[a-zA-Z]{2,8}$/.test(username)) {
+    res.status(400).json({ error: "Username must be 2–8 letters only" });
     return;
   }
   if (!/^\d{4,8}$/.test(pin)) {
@@ -21,10 +25,20 @@ router.post("/users", requireRole("admin", "superadmin"), (req, res) => {
     return;
   }
   const users = loadUsers();
-  const newUser = { id: randomUUID(), name: name.trim(), pin, role: "basic" as Role };
+  if (users.some((u) => u.username.toLowerCase() === username.trim().toLowerCase())) {
+    res.status(400).json({ error: "Username already taken" });
+    return;
+  }
+  const newUser = {
+    id: randomUUID(),
+    name: name.trim(),
+    username: username.trim().toLowerCase(),
+    pin,
+    role: "basic" as Role,
+  };
   users.push(newUser);
   saveUsers(users);
-  res.status(201).json({ id: newUser.id, name: newUser.name, role: newUser.role });
+  res.status(201).json({ id: newUser.id, name: newUser.name, username: newUser.username, role: newUser.role });
 });
 
 router.delete("/users/:id", requireRole("admin", "superadmin"), (req, res) => {
@@ -36,17 +50,13 @@ router.delete("/users/:id", requireRole("admin", "superadmin"), (req, res) => {
     return;
   }
   const target = users[idx];
-  if (target.role === "superadmin") {
-    res.status(403).json({ error: "Cannot delete the superadmin account" });
-    return;
-  }
   const requesting = users.find((u) => u.id === req.session.userId);
-  if (requesting?.role === "admin" && target.role === "admin") {
-    res.status(403).json({ error: "Admins cannot delete other admin accounts" });
-    return;
-  }
   if (target.id === req.session.userId) {
     res.status(403).json({ error: "You cannot delete your own account" });
+    return;
+  }
+  if (requesting?.role === "admin" && (target.role === "superadmin" || target.role === "admin")) {
+    res.status(403).json({ error: "Admins can only delete basic user accounts" });
     return;
   }
   users.splice(idx, 1);
@@ -95,8 +105,8 @@ router.patch("/users/:id/pin", requireAuth, (req, res) => {
 router.patch("/users/:id/role", requireRole("superadmin"), (req, res) => {
   const { id } = req.params;
   const { role } = req.body as { role?: string };
-  if (!role || !["admin", "basic"].includes(role)) {
-    res.status(400).json({ error: "Role must be 'admin' or 'basic'" });
+  if (!role || !["superadmin", "admin", "basic"].includes(role)) {
+    res.status(400).json({ error: "Role must be 'superadmin', 'admin' or 'basic'" });
     return;
   }
   const users = loadUsers();
@@ -105,8 +115,8 @@ router.patch("/users/:id/role", requireRole("superadmin"), (req, res) => {
     res.status(404).json({ error: "User not found" });
     return;
   }
-  if (target.role === "superadmin") {
-    res.status(403).json({ error: "Cannot change the superadmin role" });
+  if (target.id === req.session.userId) {
+    res.status(403).json({ error: "You cannot change your own role" });
     return;
   }
   target.role = role as Role;

@@ -7,6 +7,7 @@ export type Role = "superadmin" | "admin" | "basic";
 export interface User {
   id: string;
   name: string;
+  username: string;
   pin: string;
   role: Role;
 }
@@ -22,9 +23,14 @@ function ensureDir(): void {
 
 function initStore(): User[] {
   return [
-    { id: randomUUID(), name: "Super Admin", pin: "1111", role: "superadmin" },
-    { id: randomUUID(), name: "Administrator", pin: "9999", role: "admin" },
+    { id: randomUUID(), name: "Super Admin", username: "superadmin", pin: "1111", role: "superadmin" },
+    { id: randomUUID(), name: "Administrator", username: "admin", pin: "9999", role: "admin" },
   ];
+}
+
+function deriveUsername(name: string, index: number): string {
+  const base = name.toLowerCase().replace(/[^a-z]/g, "").slice(0, 8);
+  return base.length >= 2 ? base : `user${index}`;
 }
 
 export function loadUsers(): User[] {
@@ -36,7 +42,16 @@ export function loadUsers(): User[] {
   }
   try {
     const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw) as User[];
+    const users = JSON.parse(raw) as User[];
+    let dirty = false;
+    users.forEach((u, i) => {
+      if (!u.username) {
+        u.username = deriveUsername(u.name, i);
+        dirty = true;
+      }
+    });
+    if (dirty) saveUsers(users);
+    return users;
   } catch {
     const users = initStore();
     saveUsers(users);

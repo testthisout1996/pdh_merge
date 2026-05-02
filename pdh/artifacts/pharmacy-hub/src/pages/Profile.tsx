@@ -39,6 +39,7 @@ type Role = "superadmin" | "admin" | "basic";
 interface UserRow {
   id: string;
   name: string;
+  username: string;
   role: Role;
 }
 
@@ -124,10 +125,9 @@ export default function Profile() {
 
   const [users, setUsers] = React.useState<UserRow[]>([]);
   const [loadingUsers, setLoadingUsers] = React.useState(false);
-  const [showPins, setShowPins] = React.useState(false);
-  const [rawPins, setRawPins] = React.useState<Record<string, string>>({});
 
   const [newName, setNewName] = React.useState("");
+  const [newUsername, setNewUsername] = React.useState("");
   const [newPin, setNewPin] = React.useState("");
   const [addError, setAddError] = React.useState("");
   const [addSuccess, setAddSuccess] = React.useState("");
@@ -143,7 +143,7 @@ export default function Profile() {
   const [resetting, setResetting] = React.useState(false);
 
   const [roleTarget, setRoleTarget] = React.useState<UserRow | null>(null);
-  const [roleValue, setRoleValue] = React.useState<"admin" | "basic">("basic");
+  const [roleValue, setRoleValue] = React.useState<Role>("basic");
   const [roleError, setRoleError] = React.useState("");
   const [savingRole, setSavingRole] = React.useState(false);
 
@@ -152,12 +152,6 @@ export default function Profile() {
   const [myPinError, setMyPinError] = React.useState("");
   const [myPinSuccess, setMyPinSuccess] = React.useState("");
   const [savingMyPin, setSavingMyPin] = React.useState(false);
-
-  const [superPin, setSuperPin] = React.useState("");
-  const [superPinConfirm, setSuperPinConfirm] = React.useState("");
-  const [superPinError, setSuperPinError] = React.useState("");
-  const [superPinSuccess, setSuperPinSuccess] = React.useState("");
-  const [savingSuperPin, setSavingSuperPin] = React.useState(false);
 
   const fetchUsers = React.useCallback(async () => {
     if (!isAdmin) return;
@@ -180,18 +174,32 @@ export default function Profile() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError(""); setAddSuccess("");
-    if (!newName.trim() || !newPin) { setAddError("Name and PIN are required."); return; }
-    if (!/^\d{4,8}$/.test(newPin)) { setAddError("PIN must be 4–8 digits."); return; }
+    if (!newName.trim() || !newUsername.trim() || !newPin) {
+      setAddError("Name, username and PIN are required.");
+      return;
+    }
+    if (!/^[a-zA-Z]{2,8}$/.test(newUsername)) {
+      setAddError("Username must be 2–8 letters only.");
+      return;
+    }
+    if (!/^\d{4,8}$/.test(newPin)) {
+      setAddError("PIN must be 4–8 digits.");
+      return;
+    }
     setAdding(true);
     const res = await fetch("/api/users", {
       method: "POST", credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newName.trim(), pin: newPin }),
+      body: JSON.stringify({ name: newName.trim(), username: newUsername.trim(), pin: newPin }),
     });
     const data = await res.json();
     setAdding(false);
     if (!res.ok) { setAddError(data.error ?? "Failed to add user."); }
-    else { setAddSuccess(`User "${data.name}" added.`); setNewName(""); setNewPin(""); fetchUsers(); }
+    else {
+      setAddSuccess(`User "${data.name}" (@${data.username}) added.`);
+      setNewName(""); setNewUsername(""); setNewPin("");
+      fetchUsers();
+    }
   };
 
   const handleDelete = async () => {
@@ -253,25 +261,9 @@ export default function Profile() {
     else { setMyPinSuccess("Your PIN has been updated."); setMyPin(""); setMyPinConfirm(""); refresh(); }
   };
 
-  const handleSuperPin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSuperPinError(""); setSuperPinSuccess("");
-    if (!superPin || !superPinConfirm) { setSuperPinError("Both fields are required."); return; }
-    if (superPin !== superPinConfirm) { setSuperPinError("PINs do not match."); return; }
-    if (!/^\d{4,8}$/.test(superPin)) { setSuperPinError("PIN must be 4–8 digits."); return; }
-    setSavingSuperPin(true);
-    const res = await fetch(`/api/users/${user!.id}/pin`, {
-      method: "PATCH", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pin: superPin, confirmPin: superPinConfirm }),
-    });
-    const data = await res.json();
-    setSavingSuperPin(false);
-    if (!res.ok) { setSuperPinError(data.error ?? "Failed."); }
-    else { setSuperPinSuccess("Superadmin PIN updated."); setSuperPin(""); setSuperPinConfirm(""); }
-  };
-
-  const staffMembers = users.filter((u) => u.role !== "superadmin");
+  const staffMembers = isSuperAdmin
+    ? users.filter((u) => u.id !== user?.id)
+    : users.filter((u) => u.role !== "superadmin" && u.id !== user?.id);
 
   return (
     <div className="min-h-screen bg-[hsl(270,20%,98%)]">
@@ -335,41 +327,35 @@ export default function Profile() {
           </form>
         </Section>
 
-        {/* Superadmin: change own (superadmin) PIN */}
-        {isSuperAdmin && (
-          <Section icon={<Crown className="w-3.5 h-3.5" />} title="Superadmin PIN">
-            <p className="text-xs text-muted-foreground mb-4">Default PIN is <strong>1111</strong>. Change it on first use.</p>
-            <form onSubmit={handleSuperPin} className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <PinInput value={superPin} onChange={(v) => { setSuperPin(v); setSuperPinError(""); setSuperPinSuccess(""); }} placeholder="New PIN (4–8 digits)" />
-                <PinInput value={superPinConfirm} onChange={(v) => { setSuperPinConfirm(v); setSuperPinError(""); setSuperPinSuccess(""); }} placeholder="Confirm new PIN" />
-              </div>
-              {superPinError && <p className="text-destructive text-xs">{superPinError}</p>}
-              {superPinSuccess && <p className="text-emerald-600 text-xs font-medium">{superPinSuccess}</p>}
-              <Button type="submit" disabled={savingSuperPin} size="sm" variant="outline" className="gap-1.5">
-                <KeyRound className="w-3.5 h-3.5" />
-                {savingSuperPin ? "Saving…" : "Update Superadmin PIN"}
-              </Button>
-            </form>
-          </Section>
-        )}
-
         {/* Admin+: Add new user */}
         {isAdmin && (
           <Section icon={<Plus className="w-3.5 h-3.5" />} title="Add New User">
-            <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3">
-              <Input
-                value={newName}
-                onChange={(e) => { setNewName(e.target.value); setAddError(""); setAddSuccess(""); }}
-                placeholder="Staff name (e.g. Jane Doe)"
-                className="flex-1"
-              />
-              <div className="w-full sm:w-44">
-                <PinInput value={newPin} onChange={(v) => { setNewPin(v); setAddError(""); setAddSuccess(""); }} placeholder="4–8 digit PIN" />
+            <form onSubmit={handleAdd} className="space-y-3">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  value={newName}
+                  onChange={(e) => { setNewName(e.target.value); setAddError(""); setAddSuccess(""); }}
+                  placeholder="Full name (e.g. Jane Doe)"
+                  className="flex-1"
+                />
+                <Input
+                  value={newUsername}
+                  onChange={(e) => {
+                    setNewUsername(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8));
+                    setAddError(""); setAddSuccess("");
+                  }}
+                  placeholder="Username (2–8 letters)"
+                  className="w-full sm:w-40"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                />
+                <div className="w-full sm:w-44">
+                  <PinInput value={newPin} onChange={(v) => { setNewPin(v); setAddError(""); setAddSuccess(""); }} placeholder="4–8 digit PIN" />
+                </div>
+                <Button type="submit" disabled={adding} className="gap-1.5 shrink-0">
+                  <Plus className="w-4 h-4" /> {adding ? "Adding…" : "Add"}
+                </Button>
               </div>
-              <Button type="submit" disabled={adding} className="gap-1.5 shrink-0">
-                <Plus className="w-4 h-4" /> {adding ? "Adding…" : "Add"}
-              </Button>
             </form>
             {addError && <p className="text-destructive text-xs mt-2">{addError}</p>}
             {addSuccess && <p className="text-emerald-600 text-xs mt-2 font-medium">{addSuccess}</p>}
@@ -381,21 +367,9 @@ export default function Profile() {
           <Section icon={<Users className="w-3.5 h-3.5" />} title="Staff Members">
             <div className="flex items-center justify-between mb-4 -mt-1">
               <span className="text-xs text-muted-foreground">{staffMembers.length} member{staffMembers.length !== 1 ? "s" : ""}</span>
-              <div className="flex items-center gap-3">
-                {/* Show PINs — superadmin only */}
-                {isSuperAdmin && (
-                  <button
-                    onClick={() => setShowPins((v) => !v)}
-                    className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPins ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    {showPins ? "Hide PINs" : "Show PINs"}
-                  </button>
-                )}
-                <button onClick={fetchUsers} className="text-muted-foreground hover:text-foreground transition-colors" title="Refresh">
-                  <RefreshCw className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button onClick={fetchUsers} className="text-muted-foreground hover:text-foreground transition-colors" title="Refresh">
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             {loadingUsers ? (
@@ -403,7 +377,7 @@ export default function Profile() {
                 <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               </div>
             ) : staffMembers.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-8">No staff members yet.</p>
+              <p className="text-muted-foreground text-sm text-center py-8">No other members yet.</p>
             ) : (
               <div className="divide-y divide-border/50">
                 {staffMembers.map((u) => {
@@ -420,14 +394,16 @@ export default function Profile() {
                           <span className="font-semibold text-sm text-foreground">{u.name}</span>
                           {roleBadge(u.role)}
                         </div>
-                        {showPins && isSuperAdmin && rawPins[u.id] && (
-                          <span className="text-xs text-muted-foreground font-mono">PIN: {rawPins[u.id]}</span>
-                        )}
+                        <span className="text-xs text-muted-foreground font-mono">@{u.username}</span>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {canChangeRole && (
                           <button
-                            onClick={() => { setRoleTarget(u); setRoleValue(u.role === "admin" ? "basic" : "admin"); setRoleError(""); }}
+                            onClick={() => {
+                              setRoleTarget(u);
+                              setRoleValue(u.role === "superadmin" ? "admin" : u.role === "admin" ? "basic" : "admin");
+                              setRoleError("");
+                            }}
                             className="p-1.5 rounded-md text-muted-foreground hover:text-[hsl(260,40%,25%)] hover:bg-[hsl(260,40%,25%)]/10 transition-colors"
                             title="Change role"
                           >
@@ -473,7 +449,10 @@ export default function Profile() {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete user?</DialogTitle>
-            <DialogDescription>Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</DialogDescription>
+            <DialogDescription>
+              Are you sure you want to delete <strong>{deleteTarget?.name}</strong>{" "}
+              (@{deleteTarget?.username})? This cannot be undone.
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
@@ -509,9 +488,10 @@ export default function Profile() {
             <DialogDescription>Select the new role for this user.</DialogDescription>
           </DialogHeader>
           <div className="mt-2 space-y-3">
-            <Select value={roleValue} onValueChange={(v) => setRoleValue(v as "admin" | "basic")}>
+            <Select value={roleValue} onValueChange={(v) => setRoleValue(v as Role)}>
               <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="superadmin">Super Admin</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="basic">Basic</SelectItem>
               </SelectContent>

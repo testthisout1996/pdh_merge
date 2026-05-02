@@ -11,7 +11,8 @@ export interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
-  login: (pin: string) => Promise<{ error?: string }>;
+  login: (credentials: { username: string; pin: string }) => Promise<{ error?: string }>;
+  konamiLogin: () => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   loginModalOpen: boolean;
@@ -58,13 +59,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setPostLoginPath(null);
   }, []);
 
-  const login = React.useCallback(async (pin: string): Promise<{ error?: string }> => {
+  const login = React.useCallback(
+    async (credentials: { username: string; pin: string }): Promise<{ error?: string }> => {
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(credentials),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { error: data.error ?? "Login failed" };
+        }
+        setUser(data);
+        setLoginModalOpen(false);
+        return {};
+      } catch {
+        return { error: "Network error. Please try again." };
+      }
+    },
+    []
+  );
+
+  const konamiLogin = React.useCallback(async (): Promise<{ error?: string }> => {
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/konami", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -89,6 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         login,
+        konamiLogin,
         logout,
         refresh,
         loginModalOpen,

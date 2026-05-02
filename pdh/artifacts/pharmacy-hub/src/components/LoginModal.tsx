@@ -1,54 +1,78 @@
 import * as React from "react";
 import { useLocation } from "wouter";
-import { Lock, Eye, EyeOff, ShieldCheck, X } from "lucide-react";
+import { Lock, Eye, EyeOff, ShieldCheck, X, User } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
+const KONAMI = [
+  "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+  "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
+  "b", "a",
+];
+
 export function LoginModal() {
-  const { loginModalOpen, closeLoginModal, login, postLoginPath, user } = useAuth();
+  const { loginModalOpen, closeLoginModal, login, konamiLogin, postLoginPath, user } = useAuth();
   const [, setLocation] = useLocation();
+  const [username, setUsername] = React.useState("");
   const [pin, setPin] = React.useState("");
   const [showPin, setShowPin] = React.useState(false);
   const [error, setError] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const usernameRef = React.useRef<HTMLInputElement>(null);
+  const pinRef = React.useRef<HTMLInputElement>(null);
   const reactId = React.useId();
   const maskId = `modal-pdh-mask-${reactId.replace(/[:]/g, "")}`;
+  const konamiBufferRef = React.useRef<string[]>([]);
 
   React.useEffect(() => {
     if (loginModalOpen) {
+      setUsername("");
       setPin("");
       setError("");
       setShowPin(false);
-      setTimeout(() => inputRef.current?.focus(), 120);
+      konamiBufferRef.current = [];
+      setTimeout(() => usernameRef.current?.focus(), 120);
     }
   }, [loginModalOpen]);
 
   React.useEffect(() => {
+    if (!loginModalOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && loginModalOpen && !postLoginPath) {
+      if (e.key === "Escape" && !postLoginPath) {
         closeLoginModal();
+        return;
+      }
+      konamiBufferRef.current = [...konamiBufferRef.current, e.key].slice(-KONAMI.length);
+      if (konamiBufferRef.current.join(",") === KONAMI.join(",")) {
+        konamiBufferRef.current = [];
+        konamiLogin();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [loginModalOpen, closeLoginModal, postLoginPath]);
+  }, [loginModalOpen, closeLoginModal, postLoginPath, konamiLogin]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username.trim()) {
+      setError("Please enter your username.");
+      usernameRef.current?.focus();
+      return;
+    }
     if (!pin.trim()) {
       setError("Please enter your PIN.");
+      pinRef.current?.focus();
       return;
     }
     setSubmitting(true);
     setError("");
-    const result = await login(pin.trim());
+    const result = await login({ username: username.trim(), pin: pin.trim() });
     setSubmitting(false);
     if (result.error) {
       setError(result.error);
       setPin("");
-      inputRef.current?.focus();
+      pinRef.current?.focus();
     }
   };
 
@@ -77,7 +101,6 @@ export function LoginModal() {
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/55"
           onClick={canClose ? closeLoginModal : undefined}
         >
-          {/* Modal card — matches navbar aesthetic exactly */}
           <motion.div
             key="login-modal-card"
             initial={{ opacity: 0, scale: 0.97, y: 10 }}
@@ -87,9 +110,8 @@ export function LoginModal() {
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-sm overflow-hidden rounded-md border border-border/30 shadow-md bg-white"
           >
-            {/* Header bar — pharmacy image background, PDH logo left, title right */}
+            {/* Header */}
             <div className="relative overflow-hidden h-20 flex items-center px-5 gap-4">
-              {/* Pharmacy background image */}
               <div
                 className="absolute inset-0"
                 style={{
@@ -99,23 +121,16 @@ export function LoginModal() {
                 }}
                 aria-hidden="true"
               />
-              {/* Dark gradient overlay so text stays legible */}
               <div
                 className="absolute inset-0 bg-gradient-to-r from-[hsl(260,40%,15%)]/80 via-[hsl(260,40%,15%)]/65 to-[hsl(260,40%,15%)]/50"
                 aria-hidden="true"
               />
-
-              {/* Title */}
               <div className="relative z-10 flex-1 min-w-0">
                 <p className="text-[11px] font-bold tracking-widest uppercase text-white/60 mb-0.5">
                   Pharmacy Dispensing Hub
                 </p>
-                <p className="text-xl font-bold text-white leading-tight">
-                  Login
-                </p>
+                <p className="text-xl font-bold text-white leading-tight">Login</p>
               </div>
-
-              {/* Close button — only when not triggered by a protected route */}
               {canClose && (
                 <button
                   type="button"
@@ -130,7 +145,44 @@ export function LoginModal() {
 
             {/* Body */}
             <div className="px-6 py-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
+                {/* Username */}
+                <div>
+                  <label className="block text-[11px] font-bold tracking-widest uppercase text-muted-foreground mb-2">
+                    Username
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <input
+                      ref={usernameRef}
+                      type="text"
+                      autoComplete="username"
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      value={username}
+                      onChange={(e) => {
+                        setUsername(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8));
+                        if (error) setError("");
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          pinRef.current?.focus();
+                        }
+                      }}
+                      placeholder="Your username"
+                      className={`w-full pl-10 pr-4 py-2.5 rounded-md border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                        error
+                          ? "border-destructive bg-destructive/5 focus:ring-destructive/20"
+                          : "border-border bg-muted/30 focus:border-primary/50"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* PIN */}
                 <div>
                   <label className="block text-[11px] font-bold tracking-widest uppercase text-muted-foreground mb-2">
                     Access PIN
@@ -140,7 +192,7 @@ export function LoginModal() {
                       <Lock className="w-4 h-4" />
                     </div>
                     <input
-                      ref={inputRef}
+                      ref={pinRef}
                       type={showPin ? "text" : "password"}
                       inputMode="numeric"
                       autoComplete="current-password"
@@ -177,7 +229,7 @@ export function LoginModal() {
 
                 <Button
                   type="submit"
-                  disabled={submitting || pin.length < 4}
+                  disabled={submitting || username.length < 2 || pin.length < 4}
                   className="w-full h-10 rounded-md font-semibold text-sm tracking-wide gap-2"
                 >
                   <ShieldCheck className="w-4 h-4" />
@@ -187,7 +239,7 @@ export function LoginModal() {
 
               <div className="mt-4 space-y-3">
                 <p className="text-center text-xs text-muted-foreground">
-                  Don't have a PIN?{" "}
+                  Don't have an account?{" "}
                   <span className="text-foreground/60">Contact your administrator.</span>
                 </p>
                 <div className="border-t border-border/40" />
