@@ -140,14 +140,17 @@ export default function Profile() {
   const badgeSentinelRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const sentinel = badgeSentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting),
-      { rootMargin: "-64px 0px 0px 0px", threshold: 0 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      // Lock the navbar when the sentinel (just above the badge) reaches the navbar bottom (64 px from top)
+      const threshold = badgeSentinelRef.current
+        ? badgeSentinelRef.current.getBoundingClientRect().top + window.scrollY - 64
+        : 20;
+      setScrolled(window.scrollY >= threshold);
+    };
+    // Run once on mount so initial state is correct
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
