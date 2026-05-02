@@ -665,8 +665,10 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Role-gated quick-jump buttons */}
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* Quick-jump buttons — all 3 always rendered so the row width is fixed.
+                Admin-only buttons are invisible (not hidden) for basic users so they
+                still occupy space and the card above locks to the same width. */}
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => scrollToSection(pinSectionRef)}
@@ -674,24 +676,22 @@ export default function Profile() {
               >
                 <KeyRound className="w-4 h-4" /> Change PIN
               </button>
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => scrollToSection(addUserSectionRef)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
-                >
-                  <Plus className="w-4 h-4" /> Add User
-                </button>
-              )}
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => scrollToSection(staffSectionRef)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200"
-                >
-                  <Users className="w-4 h-4" /> Staff Members
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => scrollToSection(addUserSectionRef)}
+                aria-hidden={!isAdmin}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200 ${!isAdmin ? "invisible pointer-events-none" : ""}`}
+              >
+                <Plus className="w-4 h-4" /> Add User
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection(staffSectionRef)}
+                aria-hidden={!isAdmin}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold bg-white/15 text-white border border-white/30 hover:bg-white/25 transition-all duration-200 ${!isAdmin ? "invisible pointer-events-none" : ""}`}
+              >
+                <Users className="w-4 h-4" /> Staff Members
+              </button>
             </div>
             </div>{/* end w-fit card+buttons wrapper */}
           </motion.div>
