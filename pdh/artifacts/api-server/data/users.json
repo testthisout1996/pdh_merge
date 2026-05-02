@@ -2,21 +2,21 @@
   {
     "id": "dd5c8fab-6ba8-40ab-8aee-a94cc560d1c8",
     "name": "Super Admin",
-    "username": "superadmin",
+    "username": "ADMIN",
     "pin": "1111",
     "role": "superadmin"
   },
   {
     "id": "36998b91-43bf-481b-9e90-6f8f057d9c48",
     "name": "Administrator",
-    "username": "admin",
+    "username": "ADMN",
     "pin": "9999",
     "role": "admin"
   },
   {
     "id": "eb3e8f72-d29a-40b2-9abe-bfe11b5474ba",
     "name": "John Smith",
-    "username": "jsmith",
+    "username": "JSMITH",
     "pin": "1234",
     "role": "basic"
   }

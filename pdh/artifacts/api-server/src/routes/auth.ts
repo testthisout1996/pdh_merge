@@ -16,9 +16,7 @@ router.post("/auth/login", (req, res) => {
   }
   const users = loadUsers();
   const user = users.find(
-    (u) =>
-      u.username.toLowerCase() === username.trim().toLowerCase() &&
-      u.pin === pin.trim()
+    (u) => u.username.toUpperCase() === username.trim().toUpperCase() && u.pin === pin.trim()
   );
   if (!user) {
     res.status(401).json({ error: "Invalid username or PIN. Please try again." });

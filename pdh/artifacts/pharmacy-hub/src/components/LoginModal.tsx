@@ -21,8 +21,6 @@ export function LoginModal() {
   const [submitting, setSubmitting] = React.useState(false);
   const usernameRef = React.useRef<HTMLInputElement>(null);
   const pinRef = React.useRef<HTMLInputElement>(null);
-  const reactId = React.useId();
-  const maskId = `modal-pdh-mask-${reactId.replace(/[:]/g, "")}`;
   const konamiBufferRef = React.useRef<string[]>([]);
 
   React.useEffect(() => {
@@ -87,8 +85,6 @@ export function LoginModal() {
     }
   }, [user, loginModalOpen, postLoginPath, closeLoginModal, setLocation]);
 
-  const canClose = true;
-
   return (
     <AnimatePresence>
       {loginModalOpen && (
@@ -99,7 +95,7 @@ export function LoginModal() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/55"
-          onClick={canClose ? closeLoginModal : undefined}
+          onClick={closeLoginModal}
         >
           <motion.div
             key="login-modal-card"
@@ -131,16 +127,14 @@ export function LoginModal() {
                 </p>
                 <p className="text-xl font-bold text-white leading-tight">Login</p>
               </div>
-              {canClose && (
-                <button
-                  type="button"
-                  onClick={closeLoginModal}
-                  className="relative z-10 shrink-0 w-7 h-7 rounded-md bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
-                  aria-label="Close"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={closeLoginModal}
+                className="relative z-10 shrink-0 w-7 h-7 rounded-md bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             {/* Body */}
@@ -159,11 +153,11 @@ export function LoginModal() {
                       ref={usernameRef}
                       type="text"
                       autoComplete="username"
-                      autoCapitalize="none"
+                      autoCapitalize="characters"
                       spellCheck={false}
                       value={username}
                       onChange={(e) => {
-                        setUsername(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8));
+                        setUsername(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8).toUpperCase());
                         if (error) setError("");
                       }}
                       onKeyDown={(e) => {
@@ -172,8 +166,8 @@ export function LoginModal() {
                           pinRef.current?.focus();
                         }
                       }}
-                      placeholder="Your username"
-                      className={`w-full pl-10 pr-4 py-2.5 rounded-md border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                      placeholder="YOUR USERNAME"
+                      className={`w-full pl-10 pr-4 py-2.5 rounded-md border text-sm font-mono tracking-widest uppercase transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 ${
                         error
                           ? "border-destructive bg-destructive/5 focus:ring-destructive/20"
                           : "border-border bg-muted/30 focus:border-primary/50"

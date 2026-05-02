@@ -23,14 +23,14 @@ function ensureDir(): void {
 
 function initStore(): User[] {
   return [
-    { id: randomUUID(), name: "Super Admin", username: "superadmin", pin: "1111", role: "superadmin" },
-    { id: randomUUID(), name: "Administrator", username: "admin", pin: "9999", role: "admin" },
+    { id: randomUUID(), name: "Super Admin", username: "ADMIN", pin: "1111", role: "superadmin" },
+    { id: randomUUID(), name: "Administrator", username: "ADMN", pin: "9999", role: "admin" },
   ];
 }
 
 function deriveUsername(name: string, index: number): string {
-  const base = name.toLowerCase().replace(/[^a-z]/g, "").slice(0, 8);
-  return base.length >= 2 ? base : `user${index}`;
+  const base = name.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 8);
+  return base.length >= 2 ? base : `USR${index}`;
 }
 
 export function loadUsers(): User[] {
@@ -48,6 +48,12 @@ export function loadUsers(): User[] {
       if (!u.username) {
         u.username = deriveUsername(u.name, i);
         dirty = true;
+      } else {
+        const upper = u.username.toUpperCase();
+        if (u.username !== upper) {
+          u.username = upper;
+          dirty = true;
+        }
       }
     });
     if (dirty) saveUsers(users);

@@ -13,6 +13,7 @@ import {
   UserCog,
   Crown,
   User,
+  Pencil,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -147,6 +148,11 @@ export default function Profile() {
   const [roleError, setRoleError] = React.useState("");
   const [savingRole, setSavingRole] = React.useState(false);
 
+  const [usernameTarget, setUsernameTarget] = React.useState<UserRow | null>(null);
+  const [usernameValue, setUsernameValue] = React.useState("");
+  const [usernameError, setUsernameError] = React.useState("");
+  const [savingUsername, setSavingUsername] = React.useState(false);
+
   const [myPin, setMyPin] = React.useState("");
   const [myPinConfirm, setMyPinConfirm] = React.useState("");
   const [myPinError, setMyPinError] = React.useState("");
@@ -241,6 +247,23 @@ export default function Profile() {
     setSavingRole(false);
     if (!res.ok) { setRoleError(data.error ?? "Failed."); }
     else { setRoleTarget(null); fetchUsers(); }
+  };
+
+  const handleUsernameChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUsernameError("");
+    if (!usernameValue.trim()) { setUsernameError("Username is required."); return; }
+    if (!/^[a-zA-Z]{2,8}$/.test(usernameValue)) { setUsernameError("Username must be 2–8 letters only."); return; }
+    setSavingUsername(true);
+    const res = await fetch(`/api/users/${usernameTarget!.id}/username`, {
+      method: "PATCH", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: usernameValue.trim() }),
+    });
+    const data = await res.json();
+    setSavingUsername(false);
+    if (!res.ok) { setUsernameError(data.error ?? "Failed."); }
+    else { setUsernameTarget(null); setUsernameValue(""); fetchUsers(); }
   };
 
   const handleMyPin = async (e: React.FormEvent) => {
@@ -341,12 +364,12 @@ export default function Profile() {
                 <Input
                   value={newUsername}
                   onChange={(e) => {
-                    setNewUsername(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8));
+                    setNewUsername(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8).toUpperCase());
                     setAddError(""); setAddSuccess("");
                   }}
-                  placeholder="Username (2–8 letters)"
-                  className="w-full sm:w-40"
-                  autoCapitalize="none"
+                  placeholder="USERNAME"
+                  className="w-full sm:w-36 font-mono tracking-widest uppercase"
+                  autoCapitalize="characters"
                   spellCheck={false}
                 />
                 <div className="w-full sm:w-44">
@@ -384,6 +407,7 @@ export default function Profile() {
                   const canDelete = isSuperAdmin || (isAdmin && u.role === "basic" && u.id !== user?.id);
                   const canResetPin = isSuperAdmin || (isAdmin && u.role === "basic");
                   const canChangeRole = isSuperAdmin;
+                  const canEditUsername = isSuperAdmin || (isAdmin && u.role === "basic");
                   return (
                     <div key={u.id} className="flex items-center gap-3 py-3 group">
                       <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-sm uppercase">
@@ -394,9 +418,18 @@ export default function Profile() {
                           <span className="font-semibold text-sm text-foreground">{u.name}</span>
                           {roleBadge(u.role)}
                         </div>
-                        <span className="text-xs text-muted-foreground font-mono">@{u.username}</span>
+                        <span className="text-xs text-muted-foreground font-mono tracking-widest">@{u.username}</span>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {canEditUsername && (
+                          <button
+                            onClick={() => { setUsernameTarget(u); setUsernameValue(u.username); setUsernameError(""); }}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title="Edit username"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        )}
                         {canChangeRole && (
                           <button
                             onClick={() => {
@@ -475,6 +508,35 @@ export default function Profile() {
             <DialogFooter className="gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setResetTarget(null)}>Cancel</Button>
               <Button type="submit" disabled={resetting}>{resetting ? "Saving…" : "Save PIN"}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Username Dialog */}
+      <Dialog open={!!usernameTarget} onOpenChange={(o) => { if (!o) { setUsernameTarget(null); setUsernameValue(""); setUsernameError(""); } }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Edit username for {usernameTarget?.name}</DialogTitle>
+            <DialogDescription>Enter a new username (2–8 letters). It will be stored in capitals.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleUsernameChange} className="space-y-3 mt-2">
+            <Input
+              value={usernameValue}
+              onChange={(e) => {
+                setUsernameValue(e.target.value.replace(/[^a-zA-Z]/g, "").slice(0, 8).toUpperCase());
+                setUsernameError("");
+              }}
+              placeholder="NEW USERNAME"
+              className="font-mono tracking-widest uppercase text-center"
+              autoCapitalize="characters"
+              spellCheck={false}
+              autoFocus
+            />
+            {usernameError && <p className="text-destructive text-xs">{usernameError}</p>}
+            <DialogFooter className="gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setUsernameTarget(null)}>Cancel</Button>
+              <Button type="submit" disabled={savingUsername}>{savingUsername ? "Saving…" : "Save Username"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

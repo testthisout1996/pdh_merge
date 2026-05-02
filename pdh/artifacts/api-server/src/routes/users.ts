@@ -24,15 +24,16 @@ router.post("/users", requireRole("admin", "superadmin"), (req, res) => {
     res.status(400).json({ error: "PIN must be 4–8 digits" });
     return;
   }
+  const upper = username.trim().toUpperCase();
   const users = loadUsers();
-  if (users.some((u) => u.username.toLowerCase() === username.trim().toLowerCase())) {
+  if (users.some((u) => u.username.toUpperCase() === upper)) {
     res.status(400).json({ error: "Username already taken" });
     return;
   }
   const newUser = {
     id: randomUUID(),
     name: name.trim(),
-    username: username.trim().toLowerCase(),
+    username: upper,
     pin,
     role: "basic" as Role,
   };
@@ -100,6 +101,38 @@ router.patch("/users/:id/pin", requireAuth, (req, res) => {
   target.pin = pin;
   saveUsers(users);
   res.json({ ok: true });
+});
+
+router.patch("/users/:id/username", requireRole("admin", "superadmin"), (req, res) => {
+  const { id } = req.params;
+  const { username } = req.body as { username?: string };
+  if (!username) {
+    res.status(400).json({ error: "Username is required" });
+    return;
+  }
+  if (!/^[a-zA-Z]{2,8}$/.test(username)) {
+    res.status(400).json({ error: "Username must be 2–8 letters only" });
+    return;
+  }
+  const upper = username.trim().toUpperCase();
+  const users = loadUsers();
+  const requesting = users.find((u) => u.id === req.session.userId);
+  const target = users.find((u) => u.id === id);
+  if (!target) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+  if (requesting?.role === "admin" && (target.role === "superadmin" || target.role === "admin")) {
+    res.status(403).json({ error: "Admins can only edit usernames of basic users" });
+    return;
+  }
+  if (users.some((u) => u.id !== id && u.username.toUpperCase() === upper)) {
+    res.status(400).json({ error: "Username already taken" });
+    return;
+  }
+  target.username = upper;
+  saveUsers(users);
+  res.json({ ok: true, username: upper });
 });
 
 router.patch("/users/:id/role", requireRole("superadmin"), (req, res) => {
