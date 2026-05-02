@@ -65,6 +65,8 @@ import jsLogo from "@/assets/logos/javascript.svg";
 import blenderLogo from "@/assets/logos/blender.svg";
 import replitLogo from "@/assets/logos/replit.svg";
 import mongodbLogo from "@/assets/logos/mongodb.svg";
+import reactLogo from "@/assets/logos/react.svg";
+import typescriptLogo from "@/assets/logos/typescript.svg";
 
 const sectionVariants = {
   initial: { opacity: 0, y: 16 },
@@ -513,6 +515,22 @@ function HeroSection({ onExplore }: { onExplore: () => void }) {
                       className="w-8 h-8 transition-all duration-300 grayscale brightness-[2] opacity-80 group-hover:grayscale-0 group-hover:brightness-100 group-hover:opacity-100"
                     />
                     <span className="font-semibold tracking-wider">MongoDB</span>
+                  </div>
+                  <div className="marquee-item group flex items-center gap-3 text-white/80 cursor-default">
+                    <img
+                      src={reactLogo}
+                      alt="React"
+                      className="w-8 h-8 transition-all duration-300 grayscale brightness-[2] opacity-80 group-hover:grayscale-0 group-hover:brightness-100 group-hover:opacity-100"
+                    />
+                    <span className="font-semibold tracking-wider">React</span>
+                  </div>
+                  <div className="marquee-item group flex items-center gap-3 text-white/80 cursor-default">
+                    <img
+                      src={typescriptLogo}
+                      alt="TypeScript"
+                      className="w-8 h-8 transition-all duration-300 grayscale brightness-[2] opacity-80 group-hover:grayscale-0 group-hover:brightness-100 group-hover:opacity-100"
+                    />
+                    <span className="font-semibold tracking-wider">TypeScript</span>
                   </div>
                 </React.Fragment>
               ))}
