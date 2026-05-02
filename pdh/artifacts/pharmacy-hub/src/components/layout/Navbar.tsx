@@ -534,7 +534,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
               </DropdownMenu>
             ) : (
               <>
-                <div className="w-px h-5 bg-border" />
+                <div className="w-px h-12 bg-border" />
                 <Button
                   size="sm"
                   variant="outline"
