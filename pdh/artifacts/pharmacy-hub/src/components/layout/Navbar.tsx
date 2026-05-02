@@ -456,7 +456,7 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  sideOffset={scrolled ? 8 : 12}
+                  sideOffset={scrolled ? 5 : 9}
                   className="w-52 rounded-md p-1.5 shadow-xl border border-border/50 bg-white"
                 >
                   <div className="px-2.5 py-2 mb-1 border-b border-border/50">
