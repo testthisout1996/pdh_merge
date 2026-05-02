@@ -18,6 +18,7 @@ import {
   Activity,
   Globe,
   Pill,
+  Printer,
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,7 @@ type ComponentKey =
   | "mhraSearch"
   | "mhraDocuments";
 
-type ToolKey = "pdhWebsite" | "pilTools";
+type ToolKey = "pdhWebsite" | "pilTools" | "pilPrinter";
 
 interface ToolDef {
   name: string;
@@ -61,7 +62,7 @@ interface ToolDef {
   components: ComponentKey[];
 }
 
-const TOOL_ORDER: ToolKey[] = ["pdhWebsite", "pilTools"];
+const TOOL_ORDER: ToolKey[] = ["pdhWebsite", "pilTools", "pilPrinter"];
 
 const TOOLS: Record<ToolKey, ToolDef> = {
   pdhWebsite: {
@@ -76,6 +77,13 @@ const TOOLS: Record<ToolKey, ToolDef> = {
       "Patient Information Leaflet finder and the MHRA services it depends on.",
     icon: <Pill className="w-5 h-5" />,
     components: ["apiServer", "mhraSearch", "mhraDocuments"],
+  },
+  pilPrinter: {
+    name: "PIL Printer",
+    description:
+      "Medication leaflet merger — depends on the web frontend and MHRA document store.",
+    icon: <Printer className="w-5 h-5" />,
+    components: ["webFrontend", "mhraDocuments"],
   },
 };
 

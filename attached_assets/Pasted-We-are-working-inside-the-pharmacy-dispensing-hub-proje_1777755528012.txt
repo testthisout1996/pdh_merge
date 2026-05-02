@@ -1,0 +1,53 @@
+We are working inside the pharmacy dispensing hub project, which is the main hub website.
+
+Final goal:
+Maintain the single app/site that contains all of the tools in the current pharmacy dispensing hub. The final result should be one unified website/app that does everything the current app does, from one place, with one consistent navigation and one consistent user experience.
+
+Current folders to integrate:
+- `pilprinter’
+
+Goal:
+Incorporate the existing project located in the folder named `pilprinter` into this current hub site, while preserving the hub’s existing design, layout, navigation style, theme, and branding. Do not make unrelated changes.
+
+Important UI/theme requirement:
+The `pilprinter’ app currently has a different style, frontend, logo, theme, and visual design from the main hub. I want this new app to be imported into this project, but its UI should be adapted so that it matchs the main hub’s current UI/theme/frontend as closely as possible. Do not keep the old standalone styling unless it is absolutely necessary for functionality. Reuse the main hub’s layout, navbar, colors, typography, spacing, buttons, and general visual language so the final experience looks like one consistent site.
+
+Instructions:
+1. Inspect the currentpharmacy dispensing hub project structure first.
+2. Look specifically through the `pilprinter’ folder.
+3. Determine how the pilprinter folder is currently built, what routes/pages/components it contains, and how it starts.
+4. Import the pilprinter functionality into the main hub by routing subpages under the existing navigation (PIL Printer)
+5. Merge the actual functionality into this one app/site so the user can access all features from the same unified interface.
+6. Keep the current hub styling, logo placement, and overall visual design unchanged unless absolutely required for integration. This is an import into the current hub whilst adapting it to the current hub infrastructure.
+7. Do not alter unrelated code, assets, or configuration.
+8. Only make the smallest necessary changes to make the pilprinter and pharmacy dispensing hub work together as one site.
+9. The ‘pilprinter’ itself has its own service status and FAQ, integrate these into the existing and main pharmacy dispensing hub
+
+Styling requirements:
+- Replace or restyle any `pilprinter’ UI so it visually matches the main hub.
+- Normalize components from the imported app to use the main app’s existing frontend patterns.
+- If needed, create wrappers or shared layout components so the imported pages inherit the hub’s theme automatically.
+- Do not preserve separate app branding, themes, or layouts unless there is a hard technical reason.
+- The final product should feel and stay as it is, like one app, not two separate apps stitched together.
+- If the imported app have separate CSS frameworks, component libraries, or themes, refactor them only as needed so they inherit the hub’s design system rather than maintaining separate visual identities.
+- Keep the different app content and functionality, but make the presentation consistent with the hub.
+
+Technical requirements:
+- Check whether the project needs a single main server or multiple services.
+- Verify which port(s) each app uses.
+- Ensure all web servers listen on the correct host and port for Replit deployment.
+- If any app uses an API, confirm the API endpoints still work after integration.
+- Make sure the final app runs successfully in Replit without broken routes, missing imports, theme mismatches, or port conflicts.
+
+Before changing anything:
+- Summarize what you found in the `pilprinter’ folder.
+- Explain the integration plan.
+- Then apply only the minimum edits needed.
+
+After changes:
+- Confirm the final route structure.
+- Confirm the main port and any extra ports.
+- Confirm the app starts cleanly and the main hub loads successfully.
+- Confirm the imported app now match the main hub’s theme and frontend style.
+- Confirm there is only one unified app/site for users to use.
+

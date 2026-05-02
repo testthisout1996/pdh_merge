@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import PilSearch from "@/pages/pil-search";
-import PilPrinterComingSoon from "@/pages/pil-printer-coming-soon";
+import PilPrinter from "@/pages/pil-printer";
 import PrednisoloneCalculatorComingSoon from "@/pages/prednisolone-calculator-coming-soon";
 import Profile from "@/pages/Profile";
 import { PilUpdateProvider } from "@/context/PilUpdateContext";
@@ -50,9 +50,9 @@ function Router() {
         )}
       </Route>
 
-      {/* PIL Printer coming soon — public */}
-      <Route path="/tools/pils/pil-printer" component={PilPrinterComingSoon} />
-      <Route path="/tools/pil-printer" component={PilPrinterComingSoon} />
+      {/* PIL Printer — public */}
+      <Route path="/tools/pils/pil-printer" component={PilPrinter} />
+      <Route path="/tools/pil-printer" component={PilPrinter} />
 
       {/* Prednisolone Calculator coming soon — public */}
       <Route path="/tools/prednisolone-calculator" component={PrednisoloneCalculatorComingSoon} />

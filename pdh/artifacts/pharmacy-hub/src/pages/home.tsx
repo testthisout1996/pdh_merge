@@ -799,7 +799,7 @@ function FAQSection() {
                 users next quarter.
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-7" className="border-b-0">
+            <AccordionItem value="item-7">
               <AccordionTrigger className="text-base font-semibold">
                 Can I suggest a new tool?
               </AccordionTrigger>
@@ -808,6 +808,50 @@ function FAQSection() {
                 staff. If you have a repetitive task that you think could be
                 automated or simplified, please reach out to the development
                 team.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-8">
+              <AccordionTrigger className="text-base font-semibold">
+                Where do the PIL Printer leaflets come from?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                All leaflets are sourced directly from the Medicines and
+                Healthcare products Regulatory Agency (MHRA), the UK government
+                body responsible for licensing medicines. The leaflets are the
+                officially approved patient information documents — identical to
+                those included inside medication packaging.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-9">
+              <AccordionTrigger className="text-base font-semibold">
+                How many medications can I add in the PIL Printer at once?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                You can add up to 10 medications per merged PDF. If you need
+                more, merge your first batch, then start a new session for the
+                remaining medications.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-10">
+              <AccordionTrigger className="text-base font-semibold">
+                Can I view a single leaflet without merging?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                Yes. After adding a medication to your list, click on its name —
+                it will open the individual MHRA leaflet in a new tab so you can
+                preview it before merging.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-11" className="border-b-0">
+              <AccordionTrigger className="text-base font-semibold">
+                A PIL Printer PDF failed to load — what should I do?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                PDF loading relies on the MHRA document store. Occasional
+                failures can happen due to network issues or temporary service
+                disruption. Try removing the affected medication and re-adding
+                it, then merge again. If the problem persists, check the Service
+                Status section on the hub home page.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
