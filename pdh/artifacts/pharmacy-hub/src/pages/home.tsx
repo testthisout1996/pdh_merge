@@ -609,7 +609,10 @@ function ToolsSection() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
-            <Card className="h-full border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 bg-white flex flex-col group overflow-hidden">
+            <Card className="h-full border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 bg-white flex flex-col group overflow-hidden relative">
+              <div className="absolute -right-12 top-6 bg-accent text-accent-foreground text-xs font-bold uppercase tracking-widest py-1 px-12 rotate-45 shadow-sm z-10">
+                Coming Soon
+              </div>
               <div className="h-2 w-full bg-gradient-to-r from-secondary/40 to-secondary" />
               <CardHeader>
                 <div className="w-14 h-14 rounded-md bg-secondary/15 text-secondary-foreground flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -658,16 +661,16 @@ function ToolsSection() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
-            <Card className="h-full border-border/50 shadow-sm bg-muted/30 flex flex-col relative overflow-hidden grayscale-[30%] opacity-90">
-              <div className="absolute -right-12 top-6 bg-accent text-accent-foreground text-xs font-bold uppercase tracking-widest py-1 px-12 rotate-45 shadow-sm">
+            <Card className="h-full border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 bg-white flex flex-col group relative overflow-hidden">
+              <div className="absolute -right-12 top-6 bg-accent text-accent-foreground text-xs font-bold uppercase tracking-widest py-1 px-12 rotate-45 shadow-sm z-10">
                 Coming Soon
               </div>
-              <div className="h-2 w-full bg-muted-foreground/20" />
+              <div className="h-2 w-full bg-gradient-to-r from-muted-foreground/30 to-muted-foreground/60" />
               <CardHeader>
-                <div className="w-14 h-14 rounded-md bg-background flex items-center justify-center mb-4 text-muted-foreground border border-border">
+                <div className="w-14 h-14 rounded-md bg-muted/60 text-foreground flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                   <FileText className="w-7 h-7" />
                 </div>
-                <CardTitle className="text-xl text-muted-foreground">
+                <CardTitle className="text-xl">
                   To-Follow Slips
                 </CardTitle>
                 <CardDescription className="text-base pt-2">
@@ -690,13 +693,14 @@ function ToolsSection() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button
-                  disabled
-                  variant="outline"
-                  className="w-full rounded-md bg-background/50"
-                >
-                  Coming Soon
-                </Button>
+                <Link href="/tools/to-follow-slips" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-md shadow-sm group-hover:bg-muted/40 transition-colors"
+                  >
+                    Learn More
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
           </motion.div>

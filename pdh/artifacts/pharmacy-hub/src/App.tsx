@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import PilSearch from "@/pages/pil-search";
 import PilPrinter from "@/pages/pil-printer";
 import PrednisoloneCalculatorComingSoon from "@/pages/prednisolone-calculator-coming-soon";
+import ToFollowComingSoon from "@/pages/to-follow-coming-soon";
 import Profile from "@/pages/Profile";
 import { PilUpdateProvider } from "@/context/PilUpdateContext";
 import { PilUpdateFloatingPanel } from "@/components/pil/PilUpdateFloatingPanel";
@@ -56,6 +57,9 @@ function Router() {
 
       {/* Prednisolone Calculator coming soon — public */}
       <Route path="/tools/prednisolone-calculator" component={PrednisoloneCalculatorComingSoon} />
+
+      {/* To-Follow Slip Generator coming soon — public */}
+      <Route path="/tools/to-follow-slips" component={ToFollowComingSoon} />
 
       <Route component={NotFound} />
     </Switch>
