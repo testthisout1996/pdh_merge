@@ -133,7 +133,8 @@ export function Navbar({ active: activeProp, onNavigate, scrollContainerRef }: N
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
   const isSuperAdmin = user?.role === "superadmin";
 
-  const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
+  // DISABLED: change `false` back to `!!user` to re-enable the idle logout timer
+  const { progress, secondsLeft } = useInactivityTimer(false, () => {
     logout().then(() => setLocation("/"));
   });
 

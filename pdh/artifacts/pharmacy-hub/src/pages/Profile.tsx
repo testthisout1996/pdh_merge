@@ -257,7 +257,8 @@ export default function Profile() {
     return () => page.removeEventListener("scroll", onScroll);
   }, []);
 
-  const { progress, secondsLeft } = useInactivityTimer(!!user, () => {
+  // DISABLED: change `false` back to `!!user` to re-enable the idle logout timer
+  const { progress, secondsLeft } = useInactivityTimer(false, () => {
     logout().then(() => setLocation("/"));
   });
   const ringCircumference = 2 * Math.PI * 14;
